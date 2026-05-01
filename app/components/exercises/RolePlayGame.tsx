@@ -82,15 +82,6 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
   const renderItems = () => {
     const items = [];
     const emojiMap: { [key: string]: string } = {
-      'apples': '🍎',
-      'bananas': '🍌',
-      'cats': '🐱',
-      'dogs': '🐶',
-      'books': '📚',
-      'toys': '🧸',
-      'birds': '🐦',
-      'flowers': '🌸',
-      // Sea creatures
       'starfish': '⭐',
       'octopuses': '🐙',
       'sharks': '🦈',

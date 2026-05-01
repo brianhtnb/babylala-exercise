@@ -1,14 +1,6 @@
 import { RolePlayDialogue } from '@/types';
 
 const objectTypes = [
-  { type: 'apples', emoji: '🍎' },
-  { type: 'bananas', emoji: '🍌' },
-  { type: 'cats', emoji: '🐱' },
-  { type: 'dogs', emoji: '🐶' },
-  { type: 'books', emoji: '📚' },
-  { type: 'toys', emoji: '🧸' },
-  { type: 'birds', emoji: '🐦' },
-  { type: 'flowers', emoji: '🌸' },
   // Sea creatures from previous topic
   { type: 'starfish', emoji: '⭐' },
   { type: 'octopuses', emoji: '🐙' },
