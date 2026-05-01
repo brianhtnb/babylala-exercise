@@ -38,7 +38,6 @@ export function CountGame({ onComplete }: CountGameProps) {
 
   const currentItem = gameState.items[gameState.currentIndex];
 
-  // Speak the question when a new item is shown
   useEffect(() => {
     if (!gameState.isTransitioning && !gameState.answered) {
       speak(`How many ${currentItem.name} are there?`).catch(() => {});
@@ -58,9 +57,7 @@ export function CountGame({ onComplete }: CountGameProps) {
         isTransitioning: false,
       }));
     } else {
-      // Calculate final score
-      const finalScore = gameState.score + (gameState.isCorrect ? 1 : 0);
-      onComplete(finalScore);
+      onComplete(gameState.score + (gameState.isCorrect ? 1 : 0));
     }
   }, [gameState, onComplete]);
 
@@ -86,7 +83,6 @@ export function CountGame({ onComplete }: CountGameProps) {
       await speak('Try again!');
     }
 
-    // Wait 1.5 seconds after feedback before moving to next question
     setTimeout(() => {
       moveToNext();
     }, 1500);
@@ -100,8 +96,6 @@ export function CountGame({ onComplete }: CountGameProps) {
         className="w-full max-w-md mb-8"
       />
 
-import { SpeechButton } from '../common/SpeechButton';
-// ... inside return ...
       <div className="text-center mb-8">
         <SpeechButton text={`How many ${currentItem.name} are there?`} className="w-full justify-center">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
@@ -109,7 +103,6 @@ import { SpeechButton } from '../common/SpeechButton';
           </h2>
         </SpeechButton>
       </div>
-
 
       <div className="bg-blue-50 rounded-3xl p-6 mb-8 max-w-lg w-full">
         <div className="grid grid-cols-5 gap-2 md:gap-3 justify-items-center">

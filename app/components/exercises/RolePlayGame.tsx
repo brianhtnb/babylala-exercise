@@ -31,7 +31,6 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
 
   const currentDialogue = dialogues[gameState.currentIndex];
 
-  // Speak the question when a new dialogue is shown
   useEffect(() => {
     if (!gameState.isTransitioning && !gameState.answered) {
       speak(currentDialogue.question).catch(() => {});
@@ -74,7 +73,6 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
       await speak('Try again!');
     }
 
-    // Wait before moving to next question
     setTimeout(() => {
       moveToNext();
     }, 2000);
@@ -125,9 +123,6 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
           >
             👦
           </motion.div>
-import { SpeechButton } from '../common/SpeechButton';
-
-// ... inside render: Question
           <div className="bg-blue-100 rounded-2xl p-4 max-w-xs">
             <SpeechButton text={currentDialogue.question} className="w-full justify-center">
                 <p className="text-lg font-semibold text-blue-800">
@@ -135,36 +130,6 @@ import { SpeechButton } from '../common/SpeechButton';
                 </p>
             </SpeechButton>
           </div>
-
-          <div className="bg-yellow-50 rounded-3xl p-6 flex flex-wrap justify-center gap-2 max-w-md min-h-[120px] items-center">
-            {renderItems()}
-          </div>
-
-          <div className="bg-pink-100 rounded-2xl p-4 max-w-xs">
-            {gameState.answered && gameState.selectedOption === currentDialogue.answer ? (
-                <SpeechButton text={currentDialogue.answer} className="w-full justify-center">
-                    <p className="text-lg font-semibold text-pink-800">
-                    {currentDialogue.answer}
-                    </p>
-                </SpeechButton>
-            ) : (
-                <p className="text-lg font-semibold text-pink-800">...</p>
-            )}
-          </div>
-
-// ... inside render: Answer
-          <div className="bg-pink-100 rounded-2xl p-4 max-w-xs">
-            {gameState.answered && gameState.selectedOption === currentDialogue.answer ? (
-                <SpeechButton text={currentDialogue.answer}>
-                    <p className="text-lg font-semibold text-pink-800">
-                    {currentDialogue.answer}
-                    </p>
-                </SpeechButton>
-            ) : (
-                <p className="text-lg font-semibold text-pink-800">...</p>
-            )}
-          </div>
-
         </div>
 
         <div className="bg-yellow-50 rounded-3xl p-6 flex flex-wrap justify-center gap-2 max-w-md min-h-[120px] items-center">
@@ -180,11 +145,15 @@ import { SpeechButton } from '../common/SpeechButton';
             👧
           </motion.div>
           <div className="bg-pink-100 rounded-2xl p-4 max-w-xs">
-            <p className="text-lg font-semibold text-pink-800">
-              {gameState.answered && gameState.selectedOption === currentDialogue.answer
-                ? currentDialogue.answer
-                : '...'}
-            </p>
+            {gameState.answered && gameState.selectedOption === currentDialogue.answer ? (
+                <SpeechButton text={currentDialogue.answer} className="w-full justify-center">
+                    <p className="text-lg font-semibold text-pink-800">
+                    {currentDialogue.answer}
+                    </p>
+                </SpeechButton>
+            ) : (
+                <p className="text-lg font-semibold text-pink-800">...</p>
+            )}
           </div>
         </div>
       </div>

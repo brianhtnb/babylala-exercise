@@ -88,9 +88,6 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
         className="w-full max-w-md mb-8"
       />
 
-import { SpeechButton } from '../common/SpeechButton';
-
-// ... inside return ...
       <div className="text-center mb-8">
         <SpeechButton text="What number is missing?" className="w-full justify-center">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
