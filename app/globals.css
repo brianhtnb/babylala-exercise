@@ -18,8 +18,9 @@ html, body {
 }
 
 body {
-  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+  background: linear-gradient(135deg, #E8F5E9 0%, #B3E5FC 100%);
+  font-family: 'Quicksand', sans-serif;
+  color: #37474F;
 }
 
 button, a {

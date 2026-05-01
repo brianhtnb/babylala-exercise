@@ -9,8 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        sky: { 100: '#B3E5FC', 500: '#4FC3F7' },
+        green: { 50: '#E8F5E9', 500: '#81C784' },
+        purple: { 200: '#E1BEE7' },
+        orange: { 200: '#FFE0B2' },
+        slate: { 800: '#37474F' },
       },
     },
   },
