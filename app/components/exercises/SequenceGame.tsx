@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
-import { speak, playEffect } from '@/lib/audio';
+import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateSequenceProblems } from '@/topics/numbers-11-20/games/sequence';
 
 interface SequenceGameProps {
@@ -15,6 +15,7 @@ interface GameState {
   score: number;
   selectedOption: number | null;
   answered: boolean;
+  isTransitioning: boolean;
 }
 
 export function SequenceGame({ onComplete }: SequenceGameProps) {
@@ -24,46 +25,59 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
     score: 0,
     selectedOption: null,
     answered: false,
+    isTransitioning: false,
   });
 
   const currentProblem = problems[gameState.currentIndex];
 
-  const handleAnswer = async (answer: number) => {
-    if (gameState.answered) return;
+  // Speak the question when a new problem is shown
+  useEffect(() => {
+    if (!gameState.isTransitioning && !gameState.answered) {
+      speak('What number is missing?').catch(() => {});
+    }
+  }, [currentProblem, gameState.isTransitioning, gameState.answered]);
 
+  const moveToNext = useCallback(() => {
+    if (gameState.currentIndex < problems.length - 1) {
+      setGameState((prev) => ({
+        ...prev,
+        currentIndex: prev.currentIndex + 1,
+        selectedOption: null,
+        answered: false,
+        isTransitioning: false,
+      }));
+    } else {
+      onComplete(gameState.score);
+    }
+  }, [gameState, problems.length, onComplete]);
+
+  const handleAnswer = async (answer: number) => {
+    if (gameState.answered || gameState.isTransitioning) return;
+
+    initAudio();
     const isCorrect = answer === currentProblem.correctAnswer;
+    
     setGameState((prev) => ({
       ...prev,
       selectedOption: answer,
       answered: true,
+      isTransitioning: true,
+      score: isCorrect ? prev.score + 1 : prev.score,
     }));
 
     if (isCorrect) {
       await playEffect('correct');
       await speak(`${answer}! Great job!`);
-      setGameState((prev) => ({ ...prev, score: prev.score + 1 }));
     } else {
       await playEffect('incorrect');
       await speak('Try again!');
     }
 
+    // Wait before moving to next question
     setTimeout(() => {
-      if (gameState.currentIndex < problems.length - 1) {
-        setGameState((prev) => ({
-          ...prev,
-          currentIndex: prev.currentIndex + 1,
-          selectedOption: null,
-          answered: false,
-        }));
-      } else {
-        onComplete(gameState.score + (isCorrect ? 1 : 0));
-      }
+      moveToNext();
     }, 1500);
   };
-
-  useEffect(() => {
-    speak('What number is missing?');
-  }, [currentProblem]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">

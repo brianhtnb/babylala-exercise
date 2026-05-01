@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CountingItem } from '@/types';
 import { ProgressBar } from '../common/ProgressBar';
@@ -18,6 +18,7 @@ interface GameState {
   options: number[];
   answered: boolean;
   isCorrect: boolean | null;
+  isTransitioning: boolean;
 }
 
 export function CountGame({ onComplete }: CountGameProps) {
@@ -30,53 +31,65 @@ export function CountGame({ onComplete }: CountGameProps) {
       options: generateAnswerOptions(items[0].count),
       answered: false,
       isCorrect: null,
+      isTransitioning: false,
     };
   });
 
   const currentItem = gameState.items[gameState.currentIndex];
 
-  const handleAnswer = (answer: number) => {
-    if (gameState.answered) return;
+  // Speak the question when a new item is shown
+  useEffect(() => {
+    if (!gameState.isTransitioning && !gameState.answered) {
+      speak(`How many ${currentItem.name} are there?`).catch(() => {});
+    }
+  }, [currentItem, gameState.isTransitioning, gameState.answered]);
+
+  const moveToNext = useCallback(() => {
+    if (gameState.currentIndex < gameState.items.length - 1) {
+      const nextIndex = gameState.currentIndex + 1;
+      const nextItem = gameState.items[nextIndex];
+      setGameState((prev) => ({
+        ...prev,
+        currentIndex: nextIndex,
+        options: generateAnswerOptions(nextItem.count),
+        answered: false,
+        isCorrect: null,
+        isTransitioning: false,
+      }));
+    } else {
+      // Calculate final score
+      const finalScore = gameState.score + (gameState.isCorrect ? 1 : 0);
+      onComplete(finalScore);
+    }
+  }, [gameState, onComplete]);
+
+  const handleAnswer = async (answer: number) => {
+    if (gameState.answered || gameState.isTransitioning) return;
 
     initAudio();
     const isCorrect = answer === currentItem.count;
-
-    if (isCorrect) {
-      playEffect('correct').catch(() => {});
-      speak(`Great! There are ${currentItem.count} ${currentItem.type}s!`).catch(() => {});
-    } else {
-      playEffect('incorrect').catch(() => {});
-      speak('Try again!').catch(() => {});
-    }
 
     setGameState((prev) => ({
       ...prev,
       answered: true,
       isCorrect,
       score: isCorrect ? prev.score + 1 : prev.score,
+      isTransitioning: true,
     }));
 
+    if (isCorrect) {
+      await playEffect('correct');
+      await speak(`Great! There are ${currentItem.count} ${currentItem.name}!`);
+    } else {
+      await playEffect('incorrect');
+      await speak('Try again!');
+    }
+
+    // Wait 1.5 seconds after feedback before moving to next question
     setTimeout(() => {
-      if (gameState.currentIndex < gameState.items.length - 1) {
-        const nextIndex = gameState.currentIndex + 1;
-        const nextItem = gameState.items[nextIndex];
-        setGameState((prev) => ({
-          ...prev,
-          currentIndex: nextIndex,
-          options: generateAnswerOptions(nextItem.count),
-          answered: false,
-          isCorrect: null,
-        }));
-      } else {
-        onComplete(gameState.score + (isCorrect ? 1 : 0));
-      }
+      moveToNext();
     }, 1500);
   };
-
-  useEffect(() => {
-    const itemType = currentItem.type + 's';
-    speak(`How many ${itemType} are there?`).catch(() => {});
-  }, [currentItem]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
@@ -88,12 +101,12 @@ export function CountGame({ onComplete }: CountGameProps) {
 
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-          How many {currentItem.type}s are there?
+          How many {currentItem.name} are there?
         </h2>
       </div>
 
-      <div className="bg-blue-50 rounded-3xl p-8 mb-8 max-w-2xl w-full">
-        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+      <div className="bg-blue-50 rounded-3xl p-6 mb-8 max-w-lg w-full">
+        <div className="grid grid-cols-5 gap-2 md:gap-3 justify-items-center">
           <AnimatePresence mode="popLayout">
             {currentItem.items.map((item, index) => (
               <motion.span
@@ -101,7 +114,7 @@ export function CountGame({ onComplete }: CountGameProps) {
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: Math.min(index * 0.05, 0.5) }}
                 className="text-3xl md:text-4xl"
               >
                 {item}

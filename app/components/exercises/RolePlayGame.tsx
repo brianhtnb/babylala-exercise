@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
-import { speak, playEffect } from '@/lib/audio';
+import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateDialogues } from '@/topics/numbers-11-20/games/dialogue';
 
 interface RolePlayGameProps {
@@ -15,6 +15,7 @@ interface GameState {
   score: number;
   answered: boolean;
   selectedOption: string | null;
+  isTransitioning: boolean;
 }
 
 export function RolePlayGame({ onComplete }: RolePlayGameProps) {
@@ -24,46 +25,59 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
     score: 0,
     answered: false,
     selectedOption: null,
+    isTransitioning: false,
   });
 
   const currentDialogue = dialogues[gameState.currentIndex];
 
-  const handleAnswer = async (answer: string) => {
-    if (gameState.answered) return;
+  // Speak the question when a new dialogue is shown
+  useEffect(() => {
+    if (!gameState.isTransitioning && !gameState.answered) {
+      speak(currentDialogue.question).catch(() => {});
+    }
+  }, [currentDialogue, gameState.isTransitioning, gameState.answered]);
 
+  const moveToNext = useCallback(() => {
+    if (gameState.currentIndex < dialogues.length - 1) {
+      setGameState((prev) => ({
+        ...prev,
+        currentIndex: prev.currentIndex + 1,
+        selectedOption: null,
+        answered: false,
+        isTransitioning: false,
+      }));
+    } else {
+      onComplete(gameState.score);
+    }
+  }, [gameState, dialogues.length, onComplete]);
+
+  const handleAnswer = async (answer: string) => {
+    if (gameState.answered || gameState.isTransitioning) return;
+
+    initAudio();
     const isCorrect = answer === currentDialogue.answer;
+    
     setGameState((prev) => ({
       ...prev,
       selectedOption: answer,
       answered: true,
+      isTransitioning: true,
+      score: isCorrect ? prev.score + 1 : prev.score,
     }));
 
     if (isCorrect) {
       await playEffect('correct');
       await speak(`${answer} Great job!`);
-      setGameState((prev) => ({ ...prev, score: prev.score + 1 }));
     } else {
       await playEffect('incorrect');
       await speak('Try again!');
     }
 
+    // Wait before moving to next question
     setTimeout(() => {
-      if (gameState.currentIndex < dialogues.length - 1) {
-        setGameState((prev) => ({
-          ...prev,
-          currentIndex: prev.currentIndex + 1,
-          selectedOption: null,
-          answered: false,
-        }));
-      } else {
-        onComplete(gameState.score + (isCorrect ? 1 : 0));
-      }
+      moveToNext();
     }, 2000);
   };
-
-  useEffect(() => {
-    speak(currentDialogue.question);
-  }, [currentDialogue]);
 
   const renderItems = () => {
     const items = [];

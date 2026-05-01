@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { speak, playEffect } from '@/lib/audio';
+import { speak, playEffect, initAudio } from '@/lib/audio';
 import { ProgressBar } from '../common/ProgressBar';
 
 interface TraceGameProps {
@@ -14,9 +14,26 @@ const NUMBERS_TO_TRACE = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 export function TraceGame({ onComplete }: TraceGameProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [, setIsTracing] = useState(false);
 
   const currentNumber = NUMBERS_TO_TRACE[currentIndex];
+
+  // Speak the instruction when a new number is shown
+  useEffect(() => {
+    if (!isTransitioning) {
+      speak(`Trace the number ${currentNumber}`).catch(() => {});
+    }
+  }, [currentNumber, isTransitioning]);
+
+  const moveToNext = useCallback(() => {
+    if (currentIndex < NUMBERS_TO_TRACE.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+      setIsTransitioning(false);
+    } else {
+      onComplete(score + 1);
+    }
+  }, [currentIndex, score, onComplete]);
 
   const handleStart = () => {
     setIsTracing(true);
@@ -24,23 +41,19 @@ export function TraceGame({ onComplete }: TraceGameProps) {
 
   const handleEnd = async () => {
     setIsTracing(false);
+    setIsTransitioning(true);
+    
+    initAudio();
     await playEffect('correct');
     await speak(`${currentNumber}! Excellent!`);
-    const newScore = score + 1;
-    setScore(newScore);
+    
+    setScore((prev) => prev + 1);
 
+    // Wait before moving to next number
     setTimeout(() => {
-      if (currentIndex < NUMBERS_TO_TRACE.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      } else {
-        onComplete(newScore);
-      }
+      moveToNext();
     }, 1500);
   };
-
-  useEffect(() => {
-    speak(`Trace the number ${currentNumber}`);
-  }, [currentNumber]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">

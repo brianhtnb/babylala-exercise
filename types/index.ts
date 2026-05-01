@@ -46,7 +46,7 @@ export interface ProgressData {
 export interface CountingItem {
   id: string;
   count: number;
-  type: 'fruit' | 'animal' | 'toy';
+  name: string; // e.g., "apples", "cats", "cars"
   items: string[];
 }
 
