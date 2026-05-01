@@ -23,9 +23,9 @@ export function Button({
   className,
   sound = true,
 }: ButtonProps) {
-  const handleClick = async () => {
+  const handleClick = () => {
     if (sound) {
-      await playEffect('click');
+      playEffect('click').catch(() => {});
     }
     onClick?.();
   };

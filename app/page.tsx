@@ -1,24 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressData } from '@/types';
 import { Header } from './components/layout/Header';
 import { TopicGrid } from './components/layout/TopicGrid';
 import { loadProgress, defaultProgressData, getTotalStars } from '@/lib/storage';
 import { getAllTopics } from '@/topics';
-import { speak } from '@/lib/audio';
+import { speak, initAudio } from '@/lib/audio';
 
 export default function Home() {
   const [progress, setProgress] = useState<ProgressData>(defaultProgressData);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
     const loaded = loadProgress();
     setProgress(loaded);
     setIsLoading(false);
-    speak('Welcome to Babylala! Choose a topic to start learning!');
   }, []);
+
+  // Initialize audio on first user interaction (required for iPad/Safari)
+  const handleInteraction = useCallback(() => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      initAudio();
+      // Speak welcome message after user interaction
+      speak('Welcome to Babylala! Choose a topic to start learning!');
+    }
+  }, [hasInteracted]);
 
   const topics = getAllTopics();
   const totalStars = getTotalStars(progress);
@@ -38,7 +48,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div 
+      className="min-h-screen"
+      onClick={handleInteraction}
+      onTouchStart={handleInteraction}
+    >
       <Header title="Babylala Exercise" />
       
       <main className="container mx-auto px-4 py-8">

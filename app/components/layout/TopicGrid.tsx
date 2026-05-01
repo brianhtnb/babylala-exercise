@@ -18,9 +18,10 @@ interface TopicGridProps {
 export function TopicGrid({ topics, progress }: TopicGridProps) {
   const router = useRouter();
 
-  const handleTopicClick = async (topic: TopicConfig) => {
-    await playEffect('click');
-    await speak(`Let's learn ${topic.title}!`);
+  const handleTopicClick = (topic: TopicConfig) => {
+    // Don't await - let navigation happen immediately
+    playEffect('click').catch(() => {});
+    speak(`Let's learn ${topic.title}!`).catch(() => {});
     router.push(`/topic/${topic.id}`);
   };
 

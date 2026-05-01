@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CountingItem } from '@/types';
 import { ProgressBar } from '../common/ProgressBar';
-import { speak, playEffect } from '@/lib/audio';
+import { speak, playEffect, initAudio } from '@/lib/audio';
 import { getCountingItems, generateAnswerOptions } from '@/topics/numbers-11-20/games/counting';
 
 interface CountGameProps {
@@ -35,17 +35,18 @@ export function CountGame({ onComplete }: CountGameProps) {
 
   const currentItem = gameState.items[gameState.currentIndex];
 
-  const handleAnswer = async (answer: number) => {
+  const handleAnswer = (answer: number) => {
     if (gameState.answered) return;
 
+    initAudio();
     const isCorrect = answer === currentItem.count;
 
     if (isCorrect) {
-      await playEffect('correct');
-      await speak(`Great! There are ${currentItem.count} ${currentItem.type}s!`);
+      playEffect('correct').catch(() => {});
+      speak(`Great! There are ${currentItem.count} ${currentItem.type}s!`).catch(() => {});
     } else {
-      await playEffect('incorrect');
-      await speak('Try again!');
+      playEffect('incorrect').catch(() => {});
+      speak('Try again!').catch(() => {});
     }
 
     setGameState((prev) => ({
@@ -74,7 +75,7 @@ export function CountGame({ onComplete }: CountGameProps) {
 
   useEffect(() => {
     const itemType = currentItem.type + 's';
-    speak(`How many ${itemType} are there?`);
+    speak(`How many ${itemType} are there?`).catch(() => {});
   }, [currentItem]);
 
   return (

@@ -15,8 +15,8 @@ interface HeaderProps {
 export function Header({ title, showBack = false, onBack, className }: HeaderProps) {
   const router = useRouter();
 
-  const handleBack = async () => {
-    await playEffect('click');
+  const handleBack = () => {
+    playEffect('click').catch(() => {});
     if (onBack) {
       onBack();
     } else {
