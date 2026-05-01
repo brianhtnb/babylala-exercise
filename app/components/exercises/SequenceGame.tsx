@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
+import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateSequenceProblems } from '@/topics/numbers-11-20/games/sequence';
 
@@ -91,7 +92,7 @@ import { SpeechButton } from '../common/SpeechButton';
 
 // ... inside return ...
       <div className="text-center mb-8">
-        <SpeechButton text="What number is missing?">
+        <SpeechButton text="What number is missing?" className="w-full justify-center">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
             What number is missing?
           </h2>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CountingItem } from '@/types';
 import { ProgressBar } from '../common/ProgressBar';
+import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { getCountingItems, generateAnswerOptions } from '@/topics/numbers-11-20/games/counting';
 
@@ -102,8 +103,8 @@ export function CountGame({ onComplete }: CountGameProps) {
 import { SpeechButton } from '../common/SpeechButton';
 // ... inside return ...
       <div className="text-center mb-8">
-        <SpeechButton text={`How many ${currentItem.name} are there?`}>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+        <SpeechButton text={`How many ${currentItem.name} are there?`} className="w-full justify-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
             How many {currentItem.name} are there?
           </h2>
         </SpeechButton>

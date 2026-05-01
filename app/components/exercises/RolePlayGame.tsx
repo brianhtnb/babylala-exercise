@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
+import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateDialogues } from '@/topics/numbers-11-20/games/dialogue';
 
@@ -128,11 +129,27 @@ import { SpeechButton } from '../common/SpeechButton';
 
 // ... inside render: Question
           <div className="bg-blue-100 rounded-2xl p-4 max-w-xs">
-            <SpeechButton text={currentDialogue.question}>
+            <SpeechButton text={currentDialogue.question} className="w-full justify-center">
                 <p className="text-lg font-semibold text-blue-800">
                 {currentDialogue.question}
                 </p>
             </SpeechButton>
+          </div>
+
+          <div className="bg-yellow-50 rounded-3xl p-6 flex flex-wrap justify-center gap-2 max-w-md min-h-[120px] items-center">
+            {renderItems()}
+          </div>
+
+          <div className="bg-pink-100 rounded-2xl p-4 max-w-xs">
+            {gameState.answered && gameState.selectedOption === currentDialogue.answer ? (
+                <SpeechButton text={currentDialogue.answer} className="w-full justify-center">
+                    <p className="text-lg font-semibold text-pink-800">
+                    {currentDialogue.answer}
+                    </p>
+                </SpeechButton>
+            ) : (
+                <p className="text-lg font-semibold text-pink-800">...</p>
+            )}
           </div>
 
 // ... inside render: Answer
