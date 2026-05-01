@@ -1,7 +1,6 @@
 import { RolePlayDialogue } from '@/types';
 
 const objectTypes = [
-  // Sea creatures from previous topic
   { type: 'starfish', emoji: '⭐' },
   { type: 'octopuses', emoji: '🐙' },
   { type: 'sharks', emoji: '🦈' },
@@ -9,6 +8,11 @@ const objectTypes = [
   { type: 'dolphins', emoji: '🐬' },
   { type: 'whales', emoji: '🐋' },
 ];
+
+const numberWords: { [key: number]: string } = {
+  11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen', 15: 'fifteen',
+  16: 'sixteen', 17: 'seventeen', 18: 'eighteen', 19: 'nineteen', 20: 'twenty',
+};
 
 export function generateDialogues(count: number = 5): RolePlayDialogue[] {
   const dialogues: RolePlayDialogue[] = [];
@@ -22,19 +26,23 @@ export function generateDialogues(count: number = 5): RolePlayDialogue[] {
     usedCounts.add(countNum);
 
     const objectInfo = objectTypes[Math.floor(Math.random() * objectTypes.length)];
+    const countWord = numberWords[countNum];
 
-    const options = new Set<string>([`There are ${countNum}.`]);
+    const answer = `There are ${countWord}.`;
+    const options = new Set<string>([answer]);
+    
     while (options.size < 3) {
       const wrongCount = Math.floor(Math.random() * 10) + 11;
+      const wrongWord = numberWords[wrongCount];
       if (wrongCount !== countNum) {
-        options.add(`There are ${wrongCount}.`);
+        options.add(`There are ${wrongWord}.`);
       }
     }
 
     dialogues.push({
       id: `dialogue-${i}`,
       question: `How many ${objectInfo.type} are there?`,
-      answer: `There are ${countNum}.`,
+      answer: answer,
       count: countNum,
       objectType: objectInfo.type,
       options: Array.from(options).sort(() => Math.random() - 0.5),
