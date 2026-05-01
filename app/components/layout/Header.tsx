@@ -27,8 +27,8 @@ export function Header({ title, showBack = false, onBack, className }: HeaderPro
   return (
     <header
       className={cn(
-        'w-full px-6 py-4 flex items-center justify-between',
-        'bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600',
+        'w-full px-8 py-6 flex items-center justify-between',
+        'bg-sky-500',
         className
       )}
     >
