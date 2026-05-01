@@ -90,6 +90,13 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
       'toys': '🧸',
       'birds': '🐦',
       'flowers': '🌸',
+      // Sea creatures
+      'starfish': '⭐',
+      'octopuses': '🐙',
+      'sharks': '🦈',
+      'clownfish': '🐠',
+      'dolphins': '🐬',
+      'whales': '🐋',
     };
     const emoji = emojiMap[currentDialogue.objectType] || '🎈';
     

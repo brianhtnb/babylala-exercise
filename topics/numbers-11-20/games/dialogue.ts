@@ -9,6 +9,13 @@ const objectTypes = [
   { type: 'toys', emoji: '🧸' },
   { type: 'birds', emoji: '🐦' },
   { type: 'flowers', emoji: '🌸' },
+  // Sea creatures from previous topic
+  { type: 'starfish', emoji: '⭐' },
+  { type: 'octopuses', emoji: '🐙' },
+  { type: 'sharks', emoji: '🦈' },
+  { type: 'clownfish', emoji: '🐠' },
+  { type: 'dolphins', emoji: '🐬' },
+  { type: 'whales', emoji: '🐋' },
 ];
 
 export function generateDialogues(count: number = 5): RolePlayDialogue[] {
