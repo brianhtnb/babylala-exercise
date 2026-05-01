@@ -87,10 +87,15 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
         className="w-full max-w-md mb-8"
       />
 
+import { SpeechButton } from '../common/SpeechButton';
+
+// ... inside return ...
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-          What number is missing?
-        </h2>
+        <SpeechButton text="What number is missing?">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            What number is missing?
+          </h2>
+        </SpeechButton>
       </div>
 
       <div className="flex items-center justify-center gap-2 md:gap-4 mb-12 flex-wrap">

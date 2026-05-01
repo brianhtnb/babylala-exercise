@@ -99,11 +99,16 @@ export function CountGame({ onComplete }: CountGameProps) {
         className="w-full max-w-md mb-8"
       />
 
+import { SpeechButton } from '../common/SpeechButton';
+// ... inside return ...
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-          How many {currentItem.name} are there?
-        </h2>
+        <SpeechButton text={`How many ${currentItem.name} are there?`}>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            How many {currentItem.name} are there?
+          </h2>
+        </SpeechButton>
       </div>
+
 
       <div className="bg-blue-50 rounded-3xl p-6 mb-8 max-w-lg w-full">
         <div className="grid grid-cols-5 gap-2 md:gap-3 justify-items-center">
