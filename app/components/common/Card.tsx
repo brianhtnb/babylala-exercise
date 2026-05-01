@@ -38,7 +38,7 @@ export function Card({
       onTouchStart={handleTouchStart}
       disabled={disabled || locked}
       className={cn(
-        'bg-white rounded-3xl shadow-lg p-6 border-4 border-transparent',
+        'bg-white rounded-[30px] shadow-lg p-6 border-4 border-purple-200',
         'transition-all duration-200 w-full text-left',
         'focus:outline-none focus:ring-4 focus:ring-blue-300',
         !disabled && !locked && 'cursor-pointer hover:border-blue-300 hover:shadow-xl',

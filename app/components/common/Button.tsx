@@ -31,10 +31,10 @@ export function Button({
   };
 
   const variantStyles = {
-    primary: 'bg-blue-500 hover:bg-blue-600 text-white',
+    primary: 'bg-orange-200 hover:bg-orange-300 text-slate-800',
     secondary: 'bg-green-500 hover:bg-green-600 text-white',
     success: 'bg-green-500 hover:bg-green-600 text-white',
-    danger: 'bg-red-500 hover:bg-red-600 text-white',
+    danger: 'bg-red-400 hover:bg-red-500 text-white',
   };
 
   const sizeStyles = {
@@ -51,7 +51,7 @@ export function Button({
       onClick={handleClick}
       disabled={disabled}
       className={cn(
-        'font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+        'font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-[30px]',
         variantStyles[variant],
         sizeStyles[size],
         className
