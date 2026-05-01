@@ -73,14 +73,7 @@ export default function TopicPageClient() {
               ? getGameProgress(progress, topicId, game.id)
               : { completed: false, stars: 0 };
             
-            const isLocked = game.dependsOn
-              ? game.dependsOn.some((depId) => {
-                  const depProgress = progress
-                    ? getGameProgress(progress, topicId, depId)
-                    : { completed: false };
-                  return !depProgress.completed;
-                })
-              : false;
+            const isLocked = false;
 
             const gameColors: { [key: string]: string } = {
               counting: 'bg-orange-100 border-orange-300',
