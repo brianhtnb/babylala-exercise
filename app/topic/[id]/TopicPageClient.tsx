@@ -14,6 +14,7 @@ import {
   Languages,
   Map,
   MessageCircle,
+  Mic2,
   Pencil,
   SpellCheck,
   type LucideIcon,
@@ -36,6 +37,7 @@ const JUNGLE_GAME_CARD_BACKGROUNDS: Partial<Record<GameConfig['type'], string>> 
   'reading-quiz': '/images/jungle/animals/scene-bees-monkeys.png',
   'count-complete': '/images/jungle/animals/panorama-counting.png',
   'scene-reading': '/images/jungle/animals/panorama-yesno.png',
+  'speaking-present': '/images/jungle/speaking-present/scenario-1.png',
 };
 
 const GAME_VISUALS: Record<
@@ -101,6 +103,12 @@ const GAME_VISUALS: Record<
     iconWrap: 'border-success/40 bg-success-light',
     iconClass: 'text-success',
     Icon: Map,
+  },
+  'speaking-present': {
+    shell: 'bg-secondary/10 border-secondary/40',
+    iconWrap: 'border-secondary/35 bg-secondary/10',
+    iconClass: 'text-secondary',
+    Icon: Mic2,
   },
 };
 

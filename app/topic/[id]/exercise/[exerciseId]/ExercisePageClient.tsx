@@ -14,6 +14,7 @@ import { CountAndCompleteGame } from '@/app/components/exercises/CountAndComplet
 import { SceneReadingGame } from '@/app/components/exercises/SceneReadingGame';
 import { VocabIntroGame } from '@/app/components/exercises/VocabIntroGame';
 import { ListenPickGame } from '@/app/components/exercises/ListenPickGame';
+import { SpeakingPresentationGame } from '@/app/components/exercises/SpeakingPresentationGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
@@ -62,6 +63,8 @@ export default function ExercisePageClient() {
         return 7;
       case 'scene-reading':
         return 8;
+      case 'speaking-present':
+        return 1;
       default:
         return 10;
     }
@@ -126,6 +129,8 @@ export default function ExercisePageClient() {
         return <CountAndCompleteGame onComplete={handleGameComplete} />;
       case 'scene-reading':
         return <SceneReadingGame onComplete={handleGameComplete} />;
+      case 'speaking-present':
+        return <SpeakingPresentationGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
     }

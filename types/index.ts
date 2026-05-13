@@ -10,7 +10,8 @@ export interface GameConfig {
     | 'spelling'
     | 'reading-quiz'
     | 'count-complete'
-    | 'scene-reading';
+    | 'scene-reading'
+    | 'speaking-present';
   title: string;
   description: string;
   difficulty: 1 | 2 | 3;
@@ -75,6 +76,24 @@ export interface ListenPickQuestion {
     label: string;
   }[];
   correctId: 'a' | 'b' | 'c';
+}
+
+/** One line in a “speaking presentation” script (display + TTS text). */
+export interface SpeakingPresentationLine {
+  id: string;
+  /** Shown in UI (can include line breaks via separate lines in data) */
+  display: string;
+  /** Spoken when the line is tapped or included in Play all */
+  speak: string;
+}
+
+/** A full speaking scenario: big picture + script lines. */
+export interface SpeakingPresentationScenario {
+  id: string;
+  shortTitle: string;
+  /** Public path under /public */
+  image: string;
+  lines: SpeakingPresentationLine[];
 }
 
 export interface TopicConfig {

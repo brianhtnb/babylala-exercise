@@ -59,5 +59,13 @@ export const jungleConfig: TopicConfig = {
       difficulty: 3,
       dependsOn: ['jungle-reading'],
     },
+    {
+      id: 'jungle-speaking',
+      type: 'speaking-present',
+      title: 'Speaking Presentation',
+      description: 'Look at the picture and tell your own jungle story!',
+      difficulty: 3,
+      dependsOn: ['jungle-count', 'jungle-scene'],
+    },
   ],
 };
