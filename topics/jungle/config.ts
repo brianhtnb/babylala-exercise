@@ -5,6 +5,7 @@ export const jungleConfig: TopicConfig = {
   title: "Let's Go to the Jungle",
   icon: '🌴',
   color: 'bg-success text-white',
+  heroImage: '/images/jungle/animals/panorama-yesno.png',
   vocabulary: ['bee', 'tiger', 'frog', 'lizard', 'monkey', 'spider', 'crocodile', 'elephant', 'rabbit', 'snake'],
   sentences: [
     'There are ___ ___ in the jungle.',

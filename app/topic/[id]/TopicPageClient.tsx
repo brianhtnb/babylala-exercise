@@ -1,18 +1,84 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ChevronLeft } from 'lucide-react';
+import {
+  BarChart3,
+  Calculator,
+  ChevronLeft,
+  Hash,
+  Images,
+  Map,
+  MessageCircle,
+  Pencil,
+  SpellCheck,
+  type LucideIcon,
+} from 'lucide-react';
 import { Card } from '@/app/components/common/Card';
 import { StarDisplay } from '@/app/components/common/StarDisplay';
 
 import { getTopicById } from '@/topics';
 import { loadProgress, getGameProgress } from '@/lib/storage';
 import { speak, stopSpeaking, playEffect } from '@/lib/audio';
-import { ProgressData } from '@/types';
+import type { GameConfig, ProgressData } from '@/types';
 import { cn } from '@/lib/utils';
 import { PAGE_CONTAINER, TYPOGRAPHY, ANIMATION_DURATIONS, SETTLE_IN } from '@/lib/design-tokens';
+
+const GAME_VISUALS: Record<
+  GameConfig['type'],
+  { shell: string; iconWrap: string; iconClass: string; Icon: LucideIcon }
+> = {
+  counting: {
+    shell: 'bg-warning-light border-warning/40',
+    iconWrap: 'border-warning/35 bg-warning-light',
+    iconClass: 'text-warning',
+    Icon: Calculator,
+  },
+  sequence: {
+    shell: 'bg-primary/10 border-primary/35',
+    iconWrap: 'border-primary/30 bg-primary/10',
+    iconClass: 'text-primary',
+    Icon: BarChart3,
+  },
+  writing: {
+    shell: 'bg-info-light border-info/40',
+    iconWrap: 'border-info/35 bg-info-light',
+    iconClass: 'text-info',
+    Icon: Pencil,
+  },
+  dialogue: {
+    shell: 'bg-danger-light border-danger/35',
+    iconWrap: 'border-danger/30 bg-danger-light',
+    iconClass: 'text-danger',
+    Icon: MessageCircle,
+  },
+  spelling: {
+    shell: 'bg-secondary/10 border-secondary/40',
+    iconWrap: 'border-secondary/35 bg-secondary/10',
+    iconClass: 'text-secondary',
+    Icon: SpellCheck,
+  },
+  'reading-quiz': {
+    shell: 'bg-primary/[0.08] border-primary/30',
+    iconWrap: 'border-primary/25 bg-primary/[0.08]',
+    iconClass: 'text-primary',
+    Icon: Images,
+  },
+  'count-complete': {
+    shell: 'bg-warning-light border-warning/38',
+    iconWrap: 'border-warning/32 bg-warning-light',
+    iconClass: 'text-warning',
+    Icon: Hash,
+  },
+  'scene-reading': {
+    shell: 'bg-success-light border-success/45',
+    iconWrap: 'border-success/40 bg-success-light',
+    iconClass: 'text-success',
+    Icon: Map,
+  },
+};
 
 export default function TopicPageClient() {
   const params = useParams();
@@ -21,6 +87,8 @@ export default function TopicPageClient() {
 
   const topic = getTopicById(topicId);
   const [progress, setProgress] = useState<ProgressData | null>(null);
+
+  const isJungleTopic = topicId === 'jungle';
 
   useEffect(() => {
     setProgress(loadProgress());
@@ -47,15 +115,14 @@ export default function TopicPageClient() {
     router.push('/');
   };
 
-  const gameShell: { [key: string]: string } = {
-    counting: 'bg-warning-light border-warning/40',
-    sequence: 'bg-primary/10 border-primary/35',
-    writing: 'bg-info-light border-info/40',
-    dialogue: 'bg-danger-light border-danger/35',
-  };
-
   return (
-    <div className="min-h-screen bg-app">
+    <div
+      className={cn(
+        'min-h-screen bg-app',
+        isJungleTopic &&
+          'bg-gradient-to-br from-success/[0.11] via-app via-45% to-primary/[0.07] dark:from-success/[0.14] dark:via-app dark:to-primary/[0.09]'
+      )}
+    >
       <main className={PAGE_CONTAINER}>
         {/* Inline back nav */}
         <div className="flex items-center gap-3 mb-8">
@@ -75,14 +142,38 @@ export default function TopicPageClient() {
           transition={{ duration: ANIMATION_DURATIONS.slow, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-12"
         >
-          <div
-            className={cn(
-              'inline-flex items-center justify-center w-32 h-32 rounded-xl text-7xl mb-4 shadow-nexus-md',
-              topic.color
-            )}
-          >
-            {topic.icon}
-          </div>
+          {topic.heroImage ? (
+            <div className="relative mb-8 max-w-3xl mx-auto h-40 sm:h-44 md:h-52 rounded-2xl overflow-hidden border border-dm-border shadow-nexus-md isolate">
+              <Image
+                src={topic.heroImage}
+                alt=""
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 896px"
+                priority
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-app via-app/55 to-transparent dark:from-app dark:via-app/50 dark:to-transparent"
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/[0.04] dark:ring-white/[0.06]"
+                aria-hidden
+              />
+            </div>
+          ) : null}
+
+          {!topic.heroImage ? (
+            <div
+              className={cn(
+                'inline-flex items-center justify-center w-32 h-32 rounded-xl text-7xl mb-4 shadow-nexus-md ring-1 ring-black/[0.04] dark:ring-white/[0.08]',
+                topic.color
+              )}
+            >
+              {topic.icon}
+            </div>
+          ) : null}
           <h1 className={cn(TYPOGRAPHY.pageTitle, 'text-3xl md:text-4xl mb-3')}>{topic.title}</h1>
           <p className={cn(TYPOGRAPHY.pageSubtitle, 'max-w-2xl mx-auto text-base')}>
             Learn {topic.vocabulary.length} new words and practice {topic.sentences.length} sentence
@@ -97,6 +188,8 @@ export default function TopicPageClient() {
               : { completed: false, stars: 0 };
 
             const isLocked = false;
+            const visual = GAME_VISUALS[game.type];
+            const GameIcon = visual.Icon;
 
             return (
               <motion.div
@@ -109,14 +202,17 @@ export default function TopicPageClient() {
                   asDiv
                   onClick={() => handleGameClick(game.id)}
                   locked={isLocked}
-                  className={cn('border-2', gameShell[game.type] ?? 'border-dm-border')}
+                  className={cn('border-2', visual.shell)}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="text-5xl mb-3" aria-hidden>
-                      {game.type === 'counting' && '🔢'}
-                      {game.type === 'sequence' && '📊'}
-                      {game.type === 'writing' && '✏️'}
-                      {game.type === 'dialogue' && '💬'}
+                    <div
+                      className={cn(
+                        'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border-2 shadow-nexus-sm',
+                        visual.iconWrap
+                      )}
+                      aria-hidden
+                    >
+                      <GameIcon className={cn('h-8 w-8', visual.iconClass)} strokeWidth={2} />
                     </div>
 
                     <h2 className={cn(TYPOGRAPHY.cardTitle, 'text-xl mb-2')}>{game.title}</h2>

@@ -53,6 +53,8 @@ export interface TopicConfig {
   vocabulary: string[];
   sentences: string[];
   games: GameConfig[];
+  /** Optional hero strip image (public path, e.g. /images/jungle/animals/...) */
+  heroImage?: string;
 }
 
 export interface GameProgress {
