@@ -6,6 +6,8 @@ import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateSequenceProblems } from '@/topics/numbers-11-20/games/sequence';
+import { TYPOGRAPHY } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 interface SequenceGameProps {
   onComplete: (score: number) => void;
@@ -90,7 +92,7 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
 
       <div className="text-center mb-8">
         <SpeechButton text="What number is missing?" className="w-full justify-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h2 className={cn(TYPOGRAPHY.sectionTitle, 'text-2xl md:text-3xl')}>
             What number is missing?
           </h2>
         </SpeechButton>
@@ -103,14 +105,13 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1 }}
-            className={`
-              w-16 h-16 md:w-20 md:h-20 rounded-xl flex items-center justify-center
-              text-2xl md:text-3xl font-bold
-              ${num === null
-                ? 'border-4 border-dashed border-blue-400 bg-blue-50'
-                : 'bg-white shadow-lg text-gray-800'
-              }
-            `}
+            className={cn(
+              'w-16 h-16 md:w-20 md:h-20 rounded-xl flex items-center justify-center',
+              'text-2xl md:text-3xl font-semibold tabular-nums border-2',
+              num === null
+                ? 'border-dashed border-info bg-info-light text-content'
+                : 'bg-surface text-content shadow-nexus-md border-dm-border'
+            )}
           >
             {num !== null ? num : '?'}
           </motion.div>
@@ -125,24 +126,23 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
             whileTap={{ scale: gameState.answered ? 1 : 0.95 }}
             onClick={() => handleAnswer(option)}
             disabled={gameState.answered}
-            className={`
-              py-6 px-8 rounded-2xl text-3xl font-bold transition-all
-              ${gameState.answered
+            className={cn(
+              'py-6 px-8 rounded-xl text-3xl font-semibold transition-all border border-transparent',
+              gameState.answered
                 ? option === currentProblem.correctAnswer
-                  ? 'bg-green-500 text-white'
+                  ? 'bg-success text-white border-success/40'
                   : option === gameState.selectedOption
-                  ? 'bg-red-300 text-white'
-                  : 'bg-gray-200 text-gray-400'
-                : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-              }
-            `}
+                    ? 'bg-danger/80 text-white border-danger/30'
+                    : 'bg-surface-secondary text-content-muted border-dm-border'
+                : 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/25'
+            )}
           >
             {option}
           </motion.button>
         ))}
       </div>
 
-      <div className="mt-8 text-xl font-semibold text-gray-600">
+      <div className={cn(TYPOGRAPHY.metric, 'mt-8 text-lg tabular-nums')}>
         Score: {gameState.score} / {problems.length}
       </div>
     </div>

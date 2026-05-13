@@ -32,16 +32,16 @@ export function Card({
   return (
     <motion.button
       type="button"
-      whileHover={!disabled && !locked ? { scale: 1.02 } : {}}
-      whileTap={!disabled && !locked ? { scale: 0.98 } : {}}
+      whileHover={!disabled && !locked ? { scale: 1.01 } : {}}
+      whileTap={!disabled && !locked ? { scale: 0.99 } : {}}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       disabled={disabled || locked}
       className={cn(
-        'bg-white rounded-[30px] shadow-lg p-6 border-4 border-purple-200',
-        'transition-all duration-200 w-full text-left',
-        'focus:outline-none focus:ring-4 focus:ring-blue-300',
-        !disabled && !locked && 'cursor-pointer hover:border-blue-300 hover:shadow-xl',
+        'panel relative p-6 w-full text-left overflow-hidden',
+        'transition-shadow duration-200 shadow-nexus-sm',
+        'hover:shadow-nexus-md',
+        !disabled && !locked && onClick && 'cursor-pointer',
         (disabled || locked) && 'opacity-60 cursor-not-allowed',
         locked && 'grayscale',
         className

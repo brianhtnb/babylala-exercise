@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { Button } from '../common/Button';
 import { StarDisplay } from '../common/StarDisplay';
 import { speak, playEffect } from '@/lib/audio';
+import { TYPOGRAPHY } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 interface GameCompleteProps {
   score: number;
@@ -24,7 +26,7 @@ export function GameComplete({
   hasNextGame,
 }: GameCompleteProps) {
   const percentage = (score / totalQuestions) * 100;
-  
+
   let stars = 0;
   if (percentage >= 80) stars = 3;
   else if (percentage >= 60) stars = 2;
@@ -37,43 +39,42 @@ export function GameComplete({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 220, damping: 22 }}
       className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center"
     >
       <motion.div
-        initial={{ y: -50 }}
+        initial={{ y: -24 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 200 }}
         className="text-8xl mb-6"
+        aria-hidden
       >
         🎉
       </motion.div>
 
-      <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-        Game Complete!
-      </h2>
+      <h2 className={cn(TYPOGRAPHY.pageTitle, 'text-3xl md:text-4xl mb-3')}>Game complete!</h2>
 
-      <p className="text-2xl text-gray-600 mb-6">
-        You got <span className="font-bold text-blue-600">{score}</span> out of{' '}
-        <span className="font-bold">{totalQuestions}</span> correct!
+      <p className={cn(TYPOGRAPHY.body, 'text-lg md:text-xl mb-6 max-w-md')}>
+        You got{' '}
+        <span className={cn(TYPOGRAPHY.metric, 'text-primary inline')}>{score}</span> out of{' '}
+        <span className="font-semibold text-content">{totalQuestions}</span> correct!
       </p>
 
       <div className="mb-8">
         <StarDisplay stars={stars} size="lg" />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <Button variant="secondary" onClick={onPlayAgain}>
-          Play Again
+          Play again
         </Button>
-        
-        {hasNextGame && (
-          <Button onClick={onNextGame}>Next Game →</Button>
-        )}
-        
+
+        {hasNextGame && <Button onClick={onNextGame}>Next game →</Button>}
+
         <Button variant="secondary" onClick={onBackToTopic}>
-          Back to Topic
+          Back to topic
         </Button>
       </div>
     </motion.div>

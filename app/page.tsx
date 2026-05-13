@@ -8,6 +8,8 @@ import { TopicGrid } from './components/layout/TopicGrid';
 import { loadProgress, defaultProgressData, getTotalStars } from '@/lib/storage';
 import { getAllTopics } from '@/topics';
 import { speak, initAudio } from '@/lib/audio';
+import { PAGE_CONTAINER, TYPOGRAPHY, SETTLE_IN } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   const [progress, setProgress] = useState<ProgressData>(defaultProgressData);
@@ -20,12 +22,10 @@ export default function Home() {
     setIsLoading(false);
   }, []);
 
-  // Initialize audio on first user interaction (required for iPad/Safari)
   const handleInteraction = useCallback(() => {
     if (!hasInteracted) {
       setHasInteracted(true);
       initAudio();
-      // Speak welcome message after user interaction
       speak('Welcome to Babylala! Choose a topic to start learning!');
     }
   }, [hasInteracted]);
@@ -35,45 +35,48 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-app">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1 }}
-          className="text-6xl"
-        >
-          🔄
-        </motion.div>
+          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+          className="w-12 h-12 rounded-full border-2 border-dm-border border-t-primary border-r-primary"
+          aria-label="Loading"
+        />
       </div>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen"
+    <div
+      className="min-h-screen bg-app"
       onClick={handleInteraction}
       onTouchStart={handleInteraction}
     >
       <Header title="Babylala Exercise" />
-      
-      <main className="container mx-auto px-4 py-8">
+
+      <main className={PAGE_CONTAINER}>
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          initial={SETTLE_IN.initial}
+          animate={SETTLE_IN.animate}
+          transition={SETTLE_IN.transition}
+          className="text-center mb-10"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          <h1 className={cn(TYPOGRAPHY.pageTitle, 'text-3xl md:text-4xl mb-2')}>
             What would you like to learn today?
           </h1>
-          <p className="text-xl text-gray-600">
-            Total Stars Earned: <span className="text-yellow-500 font-bold text-2xl">{totalStars} ★</span>
+          <p className={TYPOGRAPHY.pageSubtitle}>
+            Total stars earned:{' '}
+            <span className={cn(TYPOGRAPHY.metric, 'text-score-yellow inline-block ml-1')}>
+              {totalStars} ★
+            </span>
           </p>
         </motion.div>
 
         <TopicGrid topics={topics} progress={progress} />
       </main>
 
-      <footer className="text-center py-8 text-gray-500">
-        <p>Have fun learning! 🌟</p>
+      <footer className="text-center py-8">
+        <p className={TYPOGRAPHY.caption}>Have fun learning!</p>
       </footer>
     </div>
   );

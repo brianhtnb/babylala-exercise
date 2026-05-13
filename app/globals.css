@@ -3,29 +3,122 @@
 @tailwind utilities;
 
 :root {
-  --color-sky: #4FC3F7;
-  --color-grass: #81C784;
-  --color-sun: #FFD54F;
+  --font-manrope: ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-drama: Georgia, 'Times New Roman', serif;
+  --font-mono-data: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+
+  --color-bg-app: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f8fafc;
+  --color-content: #0f172a;
+  --color-content-secondary: #475569;
+  --color-content-subtle: #334155;
+  --color-content-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
 }
 
-* {
-  box-sizing: border-box;
+.dark {
+  --color-bg-app: #0f0d16;
+  --color-surface: #13111c;
+  --color-surface-secondary: #211f2d;
+  --color-content: #f5f5f7;
+  --color-content-secondary: #c4c4ca;
+  --color-content-subtle: #a1a1aa;
+  --color-content-muted: #909098;
+  --color-border: #33323e;
+  --color-border-light: #3f3e4a;
 }
 
-html, body {
-  height: 100%;
-  overflow-x: hidden;
+@layer base {
+  html,
+  body {
+    @apply h-full overflow-x-hidden;
+  }
+
+  body {
+    @apply bg-app font-body text-content antialiased;
+  }
+
+  :where(button, a, [role='button'], input, select, textarea):focus-visible {
+    outline: 2px solid var(--color-surface);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px #853bce;
+  }
+
+  button,
+  a {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-body {
-  background: linear-gradient(135deg, #E8F5E9 0%, #B3E5FC 100%);
-  font-family: 'Quicksand', sans-serif;
-  color: #37474F;
-}
+@layer components {
+  .type-page-title {
+    @apply text-2xl font-semibold tracking-tight text-content;
+  }
 
-button, a {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  .type-page-subtitle {
+    @apply text-sm text-content-secondary;
+  }
+
+  .type-section-title {
+    @apply text-lg font-semibold text-content;
+  }
+
+  .type-section-subtitle {
+    @apply text-sm text-content-muted;
+  }
+
+  .type-card-title {
+    @apply text-base font-semibold text-content;
+  }
+
+  .type-card-body {
+    @apply text-sm text-content-secondary;
+  }
+
+  .type-caption {
+    @apply text-xs text-content-muted;
+  }
+
+  .type-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-wide text-content-muted;
+  }
+
+  .type-metric {
+    @apply text-2xl font-semibold tabular-nums text-content;
+  }
+
+  .type-control {
+    @apply text-sm font-semibold;
+  }
+
+  .panel {
+    @apply rounded-xl border border-dm-border bg-surface shadow-nexus-sm;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .no-select {
@@ -38,14 +131,14 @@ button, a {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  @apply bg-surface-secondary;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  border-radius: 8px;
+  background: rgb(100 116 139 / 0.45);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgb(100 116 139 / 0.65);
 }

@@ -6,6 +6,8 @@ import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { generateDialogues } from '@/topics/numbers-11-20/games/dialogue';
+import { TYPOGRAPHY } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 interface RolePlayGameProps {
   onComplete: (score: number) => void;
@@ -123,16 +125,16 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
           >
             👦
           </motion.div>
-          <div className="bg-blue-100 rounded-2xl p-4 max-w-xs">
+          <div className="bg-info-light rounded-xl p-4 max-w-xs border border-info/25 shadow-nexus-sm">
             <SpeechButton text={currentDialogue.question} className="w-full justify-center">
-                <p className="text-lg font-semibold text-blue-800">
+              <p className={cn(TYPOGRAPHY.body, 'text-base font-semibold text-content')}>
                 {currentDialogue.question}
-                </p>
+              </p>
             </SpeechButton>
           </div>
         </div>
 
-        <div className="bg-yellow-50 rounded-3xl p-6 flex flex-wrap justify-center gap-2 max-w-md min-h-[120px] items-center">
+        <div className="bg-warning-light rounded-xl p-6 flex flex-wrap justify-center gap-2 max-w-md min-h-[120px] items-center border border-warning/25 shadow-nexus-sm">
           {renderItems()}
         </div>
 
@@ -144,15 +146,15 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
           >
             👧
           </motion.div>
-          <div className="bg-pink-100 rounded-2xl p-4 max-w-xs">
+          <div className="bg-danger-light rounded-xl p-4 max-w-xs border border-danger/25 shadow-nexus-sm">
             {gameState.answered && gameState.selectedOption === currentDialogue.answer ? (
-                <SpeechButton text={currentDialogue.answer} className="w-full justify-center">
-                    <p className="text-lg font-semibold text-pink-800">
-                    {currentDialogue.answer}
-                    </p>
-                </SpeechButton>
+              <SpeechButton text={currentDialogue.answer} className="w-full justify-center">
+                <p className={cn(TYPOGRAPHY.body, 'text-base font-semibold text-content')}>
+                  {currentDialogue.answer}
+                </p>
+              </SpeechButton>
             ) : (
-                <p className="text-lg font-semibold text-pink-800">...</p>
+              <p className={cn(TYPOGRAPHY.body, 'text-base font-semibold text-content-muted')}>…</p>
             )}
           </div>
         </div>
@@ -166,24 +168,23 @@ export function RolePlayGame({ onComplete }: RolePlayGameProps) {
             whileTap={{ scale: gameState.answered ? 1 : 0.98 }}
             onClick={() => handleAnswer(option)}
             disabled={gameState.answered}
-            className={`
-              py-5 px-6 rounded-2xl text-lg md:text-xl font-bold transition-all
-              ${gameState.answered
+            className={cn(
+              'py-5 px-6 rounded-xl text-lg md:text-xl font-semibold transition-all border border-transparent',
+              gameState.answered
                 ? option === currentDialogue.answer
-                  ? 'bg-green-500 text-white'
+                  ? 'bg-success text-white border-success/40'
                   : option === gameState.selectedOption
-                  ? 'bg-red-300 text-white'
-                  : 'bg-gray-200 text-gray-400'
-                : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
-              }
-            `}
+                    ? 'bg-danger/80 text-white border-danger/30'
+                    : 'bg-surface-secondary text-content-muted border-dm-border'
+                : 'bg-secondary/15 text-secondary hover:bg-secondary/25 border-secondary/30'
+            )}
           >
             {option}
           </motion.button>
         ))}
       </div>
 
-      <div className="mt-6 text-xl font-semibold text-gray-600">
+      <div className={cn(TYPOGRAPHY.metric, 'mt-6 text-lg tabular-nums')}>
         Score: {gameState.score} / {dialogues.length}
       </div>
     </div>

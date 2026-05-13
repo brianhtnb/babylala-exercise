@@ -10,11 +10,9 @@ import { TraceGame } from '@/app/components/exercises/TraceGame';
 import { RolePlayGame } from '@/app/components/exercises/RolePlayGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
-import {
-  loadProgress,
-  saveProgress,
-  updateGameProgress,
-} from '@/lib/storage';
+import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
+import { PAGE_CONTAINER, TYPOGRAPHY, FADE_IN } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 export default function ExercisePageClient() {
   const params = useParams();
@@ -30,8 +28,8 @@ export default function ExercisePageClient() {
 
   if (!topic || !game) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-2xl text-gray-600">Game not found!</p>
+      <div className="min-h-screen flex items-center justify-center bg-app">
+        <p className={TYPOGRAPHY.pageTitle}>Game not found!</p>
       </div>
     );
   }
@@ -41,7 +39,8 @@ export default function ExercisePageClient() {
     setGameState('complete');
 
     let stars = 0;
-    const totalQuestions = game.type === 'dialogue' ? 5 : game.type === 'writing' ? 10 : game.type === 'sequence' ? 8 : 10;
+    const totalQuestions =
+      game.type === 'dialogue' ? 5 : game.type === 'writing' ? 10 : game.type === 'sequence' ? 8 : 10;
     const percentage = (finalScore / totalQuestions) * 100;
     if (percentage >= 80) stars = 3;
     else if (percentage >= 60) stars = 2;
@@ -90,35 +89,42 @@ export default function ExercisePageClient() {
 
   const getTotalQuestions = () => {
     switch (game.type) {
-      case 'counting': return 10;
-      case 'sequence': return 8;
-      case 'writing': return 10;
-      case 'dialogue': return 5;
-      default: return 10;
+      case 'counting':
+        return 10;
+      case 'sequence':
+        return 8;
+      case 'writing':
+        return 10;
+      case 'dialogue':
+        return 5;
+      default:
+        return 10;
     }
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-app">
       <Header title={game.title} showBack onBack={handleBackToTopic} />
 
-      <main className="container mx-auto px-4 py-4">
+      <main className={cn(PAGE_CONTAINER, 'py-4')}>
         <AnimatePresence mode="wait">
           {gameState === 'playing' ? (
             <motion.div
               key="game"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={FADE_IN.initial}
+              animate={FADE_IN.animate}
               exit={{ opacity: 0 }}
+              transition={FADE_IN.transition}
             >
               {renderGame()}
             </motion.div>
           ) : (
             <motion.div
               key="complete"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={FADE_IN.initial}
+              animate={FADE_IN.animate}
               exit={{ opacity: 0 }}
+              transition={FADE_IN.transition}
             >
               <GameComplete
                 score={score}
@@ -127,8 +133,7 @@ export default function ExercisePageClient() {
                 onBackToTopic={handleBackToTopic}
                 onNextGame={handleNextGame}
                 hasNextGame={
-                  topic.games.findIndex((g) => g.id === exerciseId) <
-                  topic.games.length - 1
+                  topic.games.findIndex((g) => g.id === exerciseId) < topic.games.length - 1
                 }
               />
             </motion.div>

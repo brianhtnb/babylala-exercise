@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { ProgressBar } from '../common/ProgressBar';
+import { TYPOGRAPHY } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 interface TraceGameProps {
   onComplete: (score: number) => void;
@@ -25,7 +27,7 @@ export function TraceGame({ onComplete }: TraceGameProps) {
     ctx.font = 'bold 80px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = '#E2E8F0'; // Light gray
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 4;
     ctx.strokeText(currentWord, ctx.canvas.width / 2, ctx.canvas.height / 2);
   }, [currentWord]);
@@ -57,7 +59,7 @@ export function TraceGame({ onComplete }: TraceGameProps) {
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
-    ctx.strokeStyle = '#3B82F6'; // Blue
+    ctx.strokeStyle = '#7C3AED';
     ctx.lineWidth = 15;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -101,12 +103,12 @@ export function TraceGame({ onComplete }: TraceGameProps) {
       />
 
       <div className="text-center mb-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-          Trace the word: <span className="text-blue-500">{currentWord}</span>
+        <h2 className={cn(TYPOGRAPHY.sectionTitle, 'text-3xl md:text-4xl')}>
+          Trace the word: <span className="text-primary">{currentWord}</span>
         </h2>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl p-2 mb-6 w-full max-w-2xl">
+      <div className="bg-surface rounded-xl shadow-nexus-md border border-dm-border p-2 mb-6 w-full max-w-2xl">
         <canvas
           ref={canvasRef}
           width={600}
@@ -122,11 +124,11 @@ export function TraceGame({ onComplete }: TraceGameProps) {
         />
       </div>
 
-      <div className="text-lg text-gray-600 text-center mb-4">
+      <div className={cn(TYPOGRAPHY.body, 'text-lg text-center mb-4')}>
         Use your finger to trace the word!
       </div>
 
-      <div className="text-xl font-semibold text-gray-600">
+      <div className={cn(TYPOGRAPHY.metric, 'text-lg tabular-nums')}>
         Score: {score} / {WORDS_TO_TRACE.length}
       </div>
     </div>

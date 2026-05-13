@@ -1,0 +1,31 @@
+---
+description: UI/design tokens and contribution rules for Babylala Exercise
+alwaysApply: true
+---
+
+# UI and design system (required reading)
+
+Before editing **UI, styling, or new screens**, follow **`docs/DESIGN-SYSTEM.md`** (source of truth and checklist).
+
+## Quick rules
+
+- **Colors:** Prefer semantic Tailwind tokens: `bg-app`, `bg-surface`, `text-content`, `border-dm-border`, `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `score-*`, `chrome-*`. Avoid ad-hoc `gray-*` / `blue-*` for product UI unless necessary (e.g. canvas).
+- **Typography:** Import `TYPOGRAPHY`, `PAGE_CONTAINER`, `SPACING`, motion presets from `@/lib/design-tokens` and pair with `type-*` classes in `app/globals.css`.
+- **Classes:** Merge with `cn()` from `@/lib/utils` (clsx + tailwind-merge).
+- **Surfaces:** Prefer `.panel` and `shadow-nexus-sm` / `shadow-nexus-md` over heavy custom borders and shadows.
+- **Icons:** Use `lucide-react` for chrome; keep stroke weight consistent.
+- **Motion:** Prefer `FADE_IN`, `SETTLE_IN`, `ANIMATION_DURATIONS` from `@/lib/design-tokens` with framer-motion.
+- **Forms:** `@tailwindcss/forms` uses class strategy; use plugin class names for native inputs.
+- **Dark mode:** `darkMode: 'class'`; variables in `globals.css`. Do not assume light-only contrast.
+- **Copy:** User-visible UI strings stay English; `lang="en"` on `html`.
+
+## Files not to bypass
+
+| Change | Edit |
+|--------|------|
+| New colors, shadows, animations | `tailwind.config.ts` |
+| Light/dark variables, base, type-*, .panel | `app/globals.css` |
+| TS typography / motion / score constants | `lib/design-tokens.ts` |
+| Font | `app/layout.tsx` (Manrope) |
+
+Do not set a global body font in CSS that bypasses `next/font` without updating this rule and `docs/DESIGN-SYSTEM.md`.

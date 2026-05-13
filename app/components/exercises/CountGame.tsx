@@ -7,6 +7,8 @@ import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
 import { speak, playEffect, initAudio } from '@/lib/audio';
 import { getCountingItems, generateAnswerOptions } from '@/topics/numbers-11-20/games/counting';
+import { TYPOGRAPHY } from '@/lib/design-tokens';
+import { cn } from '@/lib/utils';
 
 interface CountGameProps {
   onComplete: (score: number) => void;
@@ -98,13 +100,13 @@ export function CountGame({ onComplete }: CountGameProps) {
 
       <div className="text-center mb-8">
         <SpeechButton text={`How many ${currentItem.name} are there?`} className="w-full justify-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+          <h2 className={cn(TYPOGRAPHY.sectionTitle, 'text-2xl md:text-3xl mb-4')}>
             How many {currentItem.name} are there?
           </h2>
         </SpeechButton>
       </div>
 
-      <div className="bg-blue-50 rounded-3xl p-6 mb-8 max-w-lg w-full">
+      <div className="bg-surface-secondary rounded-xl border border-dm-border p-6 mb-8 max-w-lg w-full shadow-nexus-sm">
         <div className="grid grid-cols-5 gap-2 md:gap-3 justify-items-center">
           <AnimatePresence mode="popLayout">
             {currentItem.items.map((item, index) => (
@@ -131,24 +133,23 @@ export function CountGame({ onComplete }: CountGameProps) {
             whileTap={{ scale: gameState.answered ? 1 : 0.95 }}
             onClick={() => handleAnswer(option)}
             disabled={gameState.answered}
-            className={`
-              py-6 px-8 rounded-2xl text-3xl md:text-4xl font-bold transition-all
-              ${gameState.answered
+            className={cn(
+              'py-6 px-8 rounded-xl text-3xl md:text-4xl font-semibold transition-all border border-transparent',
+              gameState.answered
                 ? option === currentItem.count
-                  ? 'bg-green-500 text-white'
+                  ? 'bg-success text-white border-success/40'
                   : gameState.isCorrect === false
-                  ? 'bg-red-300 text-white'
-                  : 'bg-gray-200 text-gray-400'
-                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-              }
-            `}
+                    ? 'bg-danger/80 text-white border-danger/30'
+                    : 'bg-surface-secondary text-content-muted border-dm-border'
+                : 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/25'
+            )}
           >
             {option}
           </motion.button>
         ))}
       </div>
 
-      <div className="mt-8 text-xl font-semibold text-gray-600">
+      <div className={cn(TYPOGRAPHY.metric, 'mt-8 text-lg tabular-nums')}>
         Score: {gameState.score} / {gameState.items.length}
       </div>
     </div>
