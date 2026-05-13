@@ -6,6 +6,7 @@ export interface GameConfig {
     | 'writing'
     | 'dialogue'
     | 'vocab-intro'
+    | 'listen-pick'
     | 'spelling'
     | 'reading-quiz'
     | 'count-complete'
@@ -59,6 +60,21 @@ export interface SceneReadingQuestion {
   animal: string;
   sentence: string;
   answer: boolean;
+}
+
+/** Listen to a short script, then pick the matching picture (A/B/C). */
+export interface ListenPickQuestion {
+  question: string;
+  /** Full text under the question; user taps to speak via TTS */
+  script: string;
+  choices: {
+    id: 'a' | 'b' | 'c';
+    /** Public path e.g. /images/jungle/listen-pick/q01-a.png */
+    image: string;
+    /** Short label for accessibility */
+    label: string;
+  }[];
+  correctId: 'a' | 'b' | 'c';
 }
 
 export interface TopicConfig {

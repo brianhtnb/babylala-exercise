@@ -13,6 +13,7 @@ import { ReadingQuizGame } from '@/app/components/exercises/ReadingQuizGame';
 import { CountAndCompleteGame } from '@/app/components/exercises/CountAndCompleteGame';
 import { SceneReadingGame } from '@/app/components/exercises/SceneReadingGame';
 import { VocabIntroGame } from '@/app/components/exercises/VocabIntroGame';
+import { ListenPickGame } from '@/app/components/exercises/ListenPickGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
@@ -51,6 +52,8 @@ export default function ExercisePageClient() {
         return 5;
       case 'vocab-intro':
         return 10;
+      case 'listen-pick':
+        return 7;
       case 'spelling':
         return 10;
       case 'reading-quiz':
@@ -113,6 +116,8 @@ export default function ExercisePageClient() {
         return <RolePlayGame onComplete={handleGameComplete} />;
       case 'vocab-intro':
         return <VocabIntroGame onComplete={handleGameComplete} />;
+      case 'listen-pick':
+        return <ListenPickGame onComplete={handleGameComplete} />;
       case 'spelling':
         return <SpellingGame onComplete={handleGameComplete} />;
       case 'reading-quiz':

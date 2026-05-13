@@ -9,6 +9,7 @@ import {
   Calculator,
   ChevronLeft,
   Hash,
+  Headphones,
   Images,
   Languages,
   Map,
@@ -60,6 +61,12 @@ const GAME_VISUALS: Record<
     iconWrap: 'border-info/35 bg-info-light',
     iconClass: 'text-info',
     Icon: Languages,
+  },
+  'listen-pick': {
+    shell: 'bg-primary/[0.09] border-primary/32',
+    iconWrap: 'border-primary/28 bg-primary/[0.08]',
+    iconClass: 'text-primary',
+    Icon: Headphones,
   },
   spelling: {
     shell: 'bg-secondary/10 border-secondary/40',

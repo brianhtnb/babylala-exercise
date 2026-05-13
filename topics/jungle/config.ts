@@ -20,12 +20,20 @@ export const jungleConfig: TopicConfig = {
       difficulty: 1,
     },
     {
+      id: 'jungle-listen-pick',
+      type: 'listen-pick',
+      title: 'Listen & Pick',
+      description: 'Read the story, tap to listen, then pick the right picture!',
+      difficulty: 1,
+      dependsOn: ['jungle-vocab'],
+    },
+    {
       id: 'jungle-spelling',
       type: 'spelling',
       title: 'Spelling Master',
       description: 'Find the extra letter hiding in the word!',
       difficulty: 1,
-      dependsOn: ['jungle-vocab'],
+      dependsOn: ['jungle-listen-pick'],
     },
     {
       id: 'jungle-reading',
