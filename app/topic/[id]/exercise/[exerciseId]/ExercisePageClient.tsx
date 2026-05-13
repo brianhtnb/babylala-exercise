@@ -11,6 +11,7 @@ import { RolePlayGame } from '@/app/components/exercises/RolePlayGame';
 import { SpellingGame } from '@/app/components/exercises/SpellingGame';
 import { ReadingQuizGame } from '@/app/components/exercises/ReadingQuizGame';
 import { CountAndCompleteGame } from '@/app/components/exercises/CountAndCompleteGame';
+import { SceneReadingGame } from '@/app/components/exercises/SceneReadingGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
@@ -91,6 +92,8 @@ export default function ExercisePageClient() {
         return <ReadingQuizGame onComplete={handleGameComplete} />;
       case 'count-complete':
         return <CountAndCompleteGame onComplete={handleGameComplete} />;
+      case 'scene-reading':
+        return <SceneReadingGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
     }
@@ -104,8 +107,9 @@ export default function ExercisePageClient() {
       case 'dialogue':   return 5;
       case 'spelling':   return 10;
       case 'reading-quiz': return 10;
-      case 'count-complete': return 8;
-      default:           return 10;
+      case 'count-complete': return 7;
+      case 'scene-reading':  return 8;
+      default:               return 10;
     }
   };
 

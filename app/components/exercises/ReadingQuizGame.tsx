@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X } from 'lucide-react';
 import { ProgressBar } from '../common/ProgressBar';
-import { SpeechButton } from '../common/SpeechButton';
 import { speak, stopSpeaking, playEffect } from '@/lib/audio';
-import { readingQuestions } from '@/topics/jungle/games/reading-quiz';
+import { readingSceneQuestions } from '@/topics/jungle/games/reading-quiz';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
@@ -17,9 +16,18 @@ interface ReadingQuizGameProps {
 interface GameState {
   currentIndex: number;
   score: number;
-  selected: boolean | null;
-  isCorrect: boolean | null;
+  selected: string | null;   // the sentence string that was tapped
   isTransitioning: boolean;
+}
+
+/** Shuffle an array in place — used to randomise option order */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
@@ -27,32 +35,39 @@ export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
     currentIndex: 0,
     score: 0,
     selected: null,
-    isCorrect: null,
     isTransitioning: false,
   });
 
-  const q = readingQuestions[state.currentIndex];
-  const total = readingQuestions.length;
+  const q = readingSceneQuestions[state.currentIndex];
+  const total = readingSceneQuestions.length;
+
+  // Shuffle options once per question
+  const options = useMemo(
+    () => shuffle([q.correct, q.wrong]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.currentIndex]
+  );
 
   useEffect(() => {
     if (!state.isTransitioning && state.selected === null) {
       stopSpeaking();
-      speak(q.sentence).catch(() => {});
+      speak('Look at the picture. Which sentence is correct?').catch(() => {});
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.currentIndex, state.isTransitioning]);
 
-  const handleAnswer = useCallback(
-    (answer: boolean) => {
+  const handleSelect = useCallback(
+    (sentence: string) => {
       if (state.selected !== null || state.isTransitioning) return;
-      const correct = answer === q.answer;
+      const correct = sentence === q.correct;
       const newScore = correct ? state.score + 1 : state.score;
 
       playEffect(correct ? 'correct' : 'incorrect').catch(() => {});
+      if (correct) speak(q.correct).catch(() => {});
+
       setState((prev) => ({
         ...prev,
-        selected: answer,
-        isCorrect: correct,
+        selected: sentence,
         isTransitioning: true,
         score: newScore,
       }));
@@ -67,34 +82,26 @@ export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
           currentIndex: nextIndex,
           score: newScore,
           selected: null,
-          isCorrect: null,
           isTransitioning: false,
         });
-      }, 1200);
+      }, 1400);
     },
     [state, q, total, onComplete]
   );
 
-  const btnBase =
-    'flex-1 flex flex-col items-center justify-center gap-2 py-6 rounded-2xl border-2 text-2xl font-bold transition-all duration-200 select-none';
-
-  const trueVariant =
-    state.selected === null
-      ? 'bg-success/10 border-success/40 text-success hover:bg-success/20 active:scale-95 cursor-pointer'
-      : state.selected === true
-      ? state.isCorrect
-        ? 'bg-success border-success text-white scale-105'
-        : 'bg-danger border-danger text-white scale-95 opacity-80'
-      : 'bg-surface-secondary border-dm-border text-content-muted opacity-50 cursor-default';
-
-  const falseVariant =
-    state.selected === null
-      ? 'bg-danger/10 border-danger/40 text-danger hover:bg-danger/20 active:scale-95 cursor-pointer'
-      : state.selected === false
-      ? state.isCorrect
-        ? 'bg-success border-success text-white scale-105'
-        : 'bg-danger border-danger text-white scale-95 opacity-80'
-      : 'bg-surface-secondary border-dm-border text-content-muted opacity-50 cursor-default';
+  const optionStyle = (sentence: string) => {
+    if (state.selected === null) {
+      return 'bg-surface border-dm-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer active:scale-[0.98]';
+    }
+    if (sentence === q.correct) {
+      return 'bg-success/15 border-success text-success font-semibold scale-[1.02]';
+    }
+    if (sentence === state.selected) {
+      // wrong choice
+      return 'bg-danger/15 border-danger text-danger opacity-80';
+    }
+    return 'bg-surface-secondary border-dm-border opacity-40 cursor-default';
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -103,56 +110,62 @@ export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
       <AnimatePresence mode="wait">
         <motion.div
           key={state.currentIndex}
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.3 }}
-          className="panel p-6 mt-4"
+          exit={{ opacity: 0, y: -14 }}
+          transition={{ duration: 0.28 }}
+          className="mt-4 space-y-4"
         >
-          {/* Animal display */}
-          <div className="text-center mb-6">
-            <div className="text-8xl mb-4 leading-none" aria-hidden>{q.emoji}</div>
-            <div className="flex items-center justify-center gap-2">
-              <p className={cn(TYPOGRAPHY.sectionTitle, 'text-lg leading-snug max-w-xs')}>{q.sentence}</p>
-              <SpeechButton text={q.sentence} />
-            </div>
+          {/* Scene image */}
+          <div className="rounded-2xl overflow-hidden border border-dm-border shadow-nexus-sm">
+            <Image
+              src={q.image}
+              alt="Jungle scene"
+              width={1200}
+              height={675}
+              className="w-full h-auto object-cover"
+              priority
+            />
           </div>
 
-          {/* True / False buttons */}
-          <div className="flex gap-4 mt-4">
-            <button
-              className={cn(btnBase, trueVariant)}
-              onClick={() => handleAnswer(true)}
-              disabled={state.selected !== null}
-              aria-label="Answer True"
-            >
-              <Check className="w-8 h-8" strokeWidth={3} />
-              <span className="text-base">True</span>
-            </button>
-            <button
-              className={cn(btnBase, falseVariant)}
-              onClick={() => handleAnswer(false)}
-              disabled={state.selected !== null}
-              aria-label="Answer False"
-            >
-              <X className="w-8 h-8" strokeWidth={3} />
-              <span className="text-base">False</span>
-            </button>
+          {/* Instruction */}
+          <p className={cn(TYPOGRAPHY.label, 'text-content-muted text-center')}>
+            Which sentence correctly describes this scene?
+          </p>
+
+          {/* Sentence options */}
+          <div className="space-y-3">
+            {options.map((sentence) => (
+              <button
+                key={sentence}
+                onClick={() => handleSelect(sentence)}
+                disabled={state.selected !== null}
+                className={cn(
+                  'w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 select-none',
+                  TYPOGRAPHY.body,
+                  optionStyle(sentence)
+                )}
+              >
+                {sentence}
+              </button>
+            ))}
           </div>
 
-          {/* Feedback message */}
+          {/* Feedback */}
           <AnimatePresence>
-            {state.isCorrect !== null && (
+            {state.selected !== null && (
               <motion.p
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 className={cn(
-                  'text-center text-sm font-semibold mt-4',
-                  state.isCorrect ? 'text-success' : 'text-danger'
+                  'text-center text-sm font-semibold',
+                  state.selected === q.correct ? 'text-success' : 'text-danger'
                 )}
               >
-                {state.isCorrect ? '🎉 Correct! Well done!' : `❌ The answer is ${q.answer ? 'True' : 'False'}.`}
+                {state.selected === q.correct
+                  ? '🎉 Correct!'
+                  : `❌ The correct answer: "${q.correct}"`}
               </motion.p>
             )}
           </AnimatePresence>

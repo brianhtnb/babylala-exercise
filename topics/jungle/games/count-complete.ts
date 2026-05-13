@@ -1,59 +1,52 @@
 import type { CountCompleteQuestion } from '@/types';
 
+/**
+ * Animal counts visible in /public/images/jungle/animals/panorama-counting.png:
+ * spider × 5  |  monkey × 3  |  lizard × 4  |  tiger × 1
+ * bee × 4     |  frog × 4    |  crocodile × 2
+ *
+ * Students look at the panorama and tap the correct number word.
+ */
 export const countCompleteQuestions: CountCompleteQuestion[] = [
   {
-    emojiChar: '🐒',
-    count: 3,
-    sentence: 'There are ___ monkeys in the tree.',
+    animal: 'monkey',
+    sentence: 'There are ___ monkeys in the jungle.',
     options: ['two', 'three', 'four', 'five'],
     answer: 'three',
   },
   {
-    emojiChar: '🐸',
-    count: 5,
-    sentence: 'I see ___ frogs by the river.',
+    animal: 'frog',
+    sentence: 'There are ___ frogs in the jungle.',
     options: ['three', 'four', 'five', 'six'],
-    answer: 'five',
-  },
-  {
-    emojiChar: '🐝',
-    count: 4,
-    sentence: 'There are ___ bees on the flower.',
-    options: ['two', 'three', 'four', 'five'],
     answer: 'four',
   },
   {
-    emojiChar: '🐯',
-    count: 2,
-    sentence: 'I can see ___ tigers in the jungle.',
+    animal: 'crocodile',
+    sentence: 'There are ___ crocodiles in the jungle.',
     options: ['one', 'two', 'three', 'four'],
     answer: 'two',
   },
   {
-    emojiChar: '🐘',
-    count: 6,
-    sentence: 'There are ___ elephants by the river.',
-    options: ['four', 'five', 'six', 'seven'],
-    answer: 'six',
+    animal: 'tiger',
+    sentence: 'There is ___ tiger in the jungle.',
+    options: ['one', 'two', 'three', 'four'],
+    answer: 'one',
   },
   {
-    emojiChar: '🐰',
-    count: 3,
-    sentence: 'I count ___ rabbits in the field.',
+    animal: 'lizard',
+    sentence: 'There are ___ lizards in the jungle.',
     options: ['two', 'three', 'four', 'five'],
-    answer: 'three',
+    answer: 'four',
   },
   {
-    emojiChar: '🐍',
-    count: 4,
-    sentence: 'There are ___ snakes on the tree.',
+    animal: 'bee',
+    sentence: 'There are ___ bees in the jungle.',
     options: ['three', 'four', 'five', 'six'],
     answer: 'four',
   },
   {
-    emojiChar: '🦎',
-    count: 5,
-    sentence: 'I see ___ lizards on the rock.',
+    animal: 'spider',
+    sentence: 'There are ___ spiders in the jungle.',
     options: ['three', 'four', 'five', 'six'],
     answer: 'five',
   },

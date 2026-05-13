@@ -1,6 +1,6 @@
 export interface GameConfig {
   id: string;
-  type: 'counting' | 'sequence' | 'writing' | 'dialogue' | 'spelling' | 'reading-quiz' | 'count-complete';
+  type: 'counting' | 'sequence' | 'writing' | 'dialogue' | 'spelling' | 'reading-quiz' | 'count-complete' | 'scene-reading';
   title: string;
   description: string;
   difficulty: 1 | 2 | 3;
@@ -23,12 +23,26 @@ export interface ReadingQuestion {
 }
 
 export interface CountCompleteQuestion {
-  emojiChar: string;
-  count: number;
+  /** Animal name — used to derive the image path and highlight in the scene */
+  animal: string;
   /** Sentence with "___" as the blank to fill */
   sentence: string;
   options: string[];
   answer: string;
+}
+
+export interface ReadingSceneQuestion {
+  /** Relative path inside /public — e.g. /images/jungle/animals/scene-*.png */
+  image: string;
+  correct: string;
+  wrong: string;
+}
+
+export interface SceneReadingQuestion {
+  /** The animal being asked about */
+  animal: string;
+  sentence: string;
+  answer: boolean;
 }
 
 export interface TopicConfig {

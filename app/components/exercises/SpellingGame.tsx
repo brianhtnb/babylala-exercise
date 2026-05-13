@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
@@ -8,6 +9,19 @@ import { speak, stopSpeaking, playEffect } from '@/lib/audio';
 import { spellingQuestions } from '@/topics/jungle/games/spelling';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
+
+const ANIMAL_IMAGES: Record<string, string> = {
+  bee:       '/images/jungle/animals/bee.png',
+  frog:      '/images/jungle/animals/frog.png',
+  tiger:     '/images/jungle/animals/tiger.png',
+  snake:     '/images/jungle/animals/snake.png',
+  monkey:    '/images/jungle/animals/monkey.png',
+  spider:    '/images/jungle/animals/spider.png',
+  rabbit:    '/images/jungle/animals/rabbit.png',
+  lizard:    '/images/jungle/animals/lizard.png',
+  elephant:  '/images/jungle/animals/elephant.png',
+  crocodile: '/images/jungle/animals/crocodile.png',
+};
 
 interface SpellingGameProps {
   onComplete: (score: number) => void;
@@ -136,7 +150,16 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
           transition={{ type: 'spring', stiffness: 280, damping: 20 }}
           className="mb-4"
         >
-          <div className="text-7xl mb-3" aria-hidden>{q.emoji}</div>
+          <div className="flex justify-center mb-3">
+            <Image
+              src={ANIMAL_IMAGES[q.word] ?? q.emoji}
+              alt={q.word}
+              width={160}
+              height={160}
+              className="object-contain drop-shadow-md"
+              priority
+            />
+          </div>
           <div className="flex items-center justify-center gap-2">
             <p className={cn(TYPOGRAPHY.sectionTitle, 'capitalize')}>{q.word}</p>
             <SpeechButton text={q.word} />
