@@ -1,6 +1,15 @@
 export interface GameConfig {
   id: string;
-  type: 'counting' | 'sequence' | 'writing' | 'dialogue' | 'spelling' | 'reading-quiz' | 'count-complete' | 'scene-reading';
+  type:
+    | 'counting'
+    | 'sequence'
+    | 'writing'
+    | 'dialogue'
+    | 'vocab-intro'
+    | 'spelling'
+    | 'reading-quiz'
+    | 'count-complete'
+    | 'scene-reading';
   title: string;
   description: string;
   difficulty: 1 | 2 | 3;
@@ -8,6 +17,13 @@ export interface GameConfig {
 }
 
 /* ── Jungle game data types ─────────────────────────────────── */
+
+/** One screen in the “new words” intro carousel */
+export interface VocabIntroItem {
+  word: string;
+  /** Public path under /public */
+  image: string;
+}
 
 export interface SpellingQuestion {
   word: string;

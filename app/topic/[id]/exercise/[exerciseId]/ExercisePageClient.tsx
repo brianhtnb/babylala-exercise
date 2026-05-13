@@ -12,6 +12,7 @@ import { SpellingGame } from '@/app/components/exercises/SpellingGame';
 import { ReadingQuizGame } from '@/app/components/exercises/ReadingQuizGame';
 import { CountAndCompleteGame } from '@/app/components/exercises/CountAndCompleteGame';
 import { SceneReadingGame } from '@/app/components/exercises/SceneReadingGame';
+import { VocabIntroGame } from '@/app/components/exercises/VocabIntroGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
@@ -38,13 +39,37 @@ export default function ExercisePageClient() {
     );
   }
 
+  const getTotalQuestions = () => {
+    switch (game.type) {
+      case 'counting':
+        return 10;
+      case 'sequence':
+        return 8;
+      case 'writing':
+        return 10;
+      case 'dialogue':
+        return 5;
+      case 'vocab-intro':
+        return 10;
+      case 'spelling':
+        return 10;
+      case 'reading-quiz':
+        return 5;
+      case 'count-complete':
+        return 7;
+      case 'scene-reading':
+        return 8;
+      default:
+        return 10;
+    }
+  };
+
   const handleGameComplete = (finalScore: number) => {
     setScore(finalScore);
     setGameState('complete');
 
     let stars = 0;
-    const totalQuestions =
-      game.type === 'dialogue' ? 5 : game.type === 'writing' ? 10 : game.type === 'sequence' ? 8 : 10;
+    const totalQuestions = getTotalQuestions();
     const percentage = (finalScore / totalQuestions) * 100;
     if (percentage >= 80) stars = 3;
     else if (percentage >= 60) stars = 2;
@@ -86,6 +111,8 @@ export default function ExercisePageClient() {
         return <TraceGame onComplete={handleGameComplete} />;
       case 'dialogue':
         return <RolePlayGame onComplete={handleGameComplete} />;
+      case 'vocab-intro':
+        return <VocabIntroGame onComplete={handleGameComplete} />;
       case 'spelling':
         return <SpellingGame onComplete={handleGameComplete} />;
       case 'reading-quiz':
@@ -96,20 +123,6 @@ export default function ExercisePageClient() {
         return <SceneReadingGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
-    }
-  };
-
-  const getTotalQuestions = () => {
-    switch (game.type) {
-      case 'counting':   return 10;
-      case 'sequence':   return 8;
-      case 'writing':    return 10;
-      case 'dialogue':   return 5;
-      case 'spelling':   return 10;
-      case 'reading-quiz': return 10;
-      case 'count-complete': return 7;
-      case 'scene-reading':  return 8;
-      default:               return 10;
     }
   };
 

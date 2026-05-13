@@ -13,11 +13,19 @@ export const jungleConfig: TopicConfig = {
   ],
   games: [
     {
+      id: 'jungle-vocab',
+      type: 'vocab-intro',
+      title: 'New Words',
+      description: 'Listen, read the word, and look at the picture!',
+      difficulty: 1,
+    },
+    {
       id: 'jungle-spelling',
       type: 'spelling',
       title: 'Spelling Master',
       description: 'Find the extra letter hiding in the word!',
       difficulty: 1,
+      dependsOn: ['jungle-vocab'],
     },
     {
       id: 'jungle-reading',

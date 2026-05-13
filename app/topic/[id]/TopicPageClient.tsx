@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   Hash,
   Images,
+  Languages,
   Map,
   MessageCircle,
   Pencil,
@@ -53,6 +54,12 @@ const GAME_VISUALS: Record<
     iconWrap: 'border-danger/30 bg-danger-light',
     iconClass: 'text-danger',
     Icon: MessageCircle,
+  },
+  'vocab-intro': {
+    shell: 'bg-info-light border-info/40',
+    iconWrap: 'border-info/35 bg-info-light',
+    iconClass: 'text-info',
+    Icon: Languages,
   },
   spelling: {
     shell: 'bg-secondary/10 border-secondary/40',
