@@ -57,13 +57,12 @@ export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
   }, [state.currentIndex, state.isTransitioning]);
 
   const handleSelect = useCallback(
-    (sentence: string) => {
+    async (sentence: string) => {
       if (state.selected !== null || state.isTransitioning) return;
       const correct = sentence === q.correct;
       const newScore = correct ? state.score + 1 : state.score;
 
       playEffect(correct ? 'correct' : 'incorrect').catch(() => {});
-      if (correct) speak(q.correct).catch(() => {});
 
       setState((prev) => ({
         ...prev,
@@ -72,19 +71,25 @@ export function ReadingQuizGame({ onComplete }: ReadingQuizGameProps) {
         score: newScore,
       }));
 
-      setTimeout(() => {
-        const nextIndex = state.currentIndex + 1;
-        if (nextIndex >= total) {
-          onComplete(newScore);
-          return;
-        }
-        setState({
-          currentIndex: nextIndex,
-          score: newScore,
-          selected: null,
-          isTransitioning: false,
-        });
-      }, 1400);
+      // Always speak the correct sentence so the student hears the right answer
+      try {
+        await speak(q.correct);
+      } catch { /* ignore */ }
+
+      // Short pause after speaking before advancing
+      await new Promise<void>((r) => setTimeout(r, 450));
+
+      const nextIndex = state.currentIndex + 1;
+      if (nextIndex >= total) {
+        onComplete(newScore);
+        return;
+      }
+      setState({
+        currentIndex: nextIndex,
+        score: newScore,
+        selected: null,
+        isTransitioning: false,
+      });
     },
     [state, q, total, onComplete]
   );

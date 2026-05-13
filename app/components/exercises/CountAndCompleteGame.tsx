@@ -62,7 +62,7 @@ export function CountAndCompleteGame({ onComplete }: CountAndCompleteGameProps) 
   }, [state.currentIndex, state.isTransitioning]);
 
   const handleAnswer = useCallback(
-    (option: string) => {
+    async (option: string) => {
       if (state.isTransitioning) return;
       const correct = option === q.answer;
       playEffect(correct ? 'correct' : 'incorrect').catch(() => {});
@@ -77,20 +77,25 @@ export function CountAndCompleteGame({ onComplete }: CountAndCompleteGameProps) 
           isTransitioning: true,
           score: newScore,
         }));
-        speak(q.sentence.replace('___', option)).catch(() => {});
-        setTimeout(() => {
-          const nextIndex = state.currentIndex + 1;
-          if (nextIndex >= total) { onComplete(newScore); return; }
-          setState({
-            currentIndex: nextIndex,
-            score: newScore,
-            selected: null,
-            isCorrect: null,
-            wrongOption: null,
-            isTransitioning: false,
-            filledWord: null,
-          });
-        }, 2000);
+
+        // Speak the completed sentence and wait for it to finish
+        try {
+          await speak(q.sentence.replace('___', option));
+        } catch { /* ignore */ }
+
+        await new Promise<void>((r) => setTimeout(r, 450));
+
+        const nextIndex = state.currentIndex + 1;
+        if (nextIndex >= total) { onComplete(newScore); return; }
+        setState({
+          currentIndex: nextIndex,
+          score: newScore,
+          selected: null,
+          isCorrect: null,
+          wrongOption: null,
+          isTransitioning: false,
+          filledWord: null,
+        });
       } else {
         setState((prev) => ({ ...prev, wrongOption: option }));
         setTimeout(() => setState((prev) => ({ ...prev, wrongOption: null })), 500);

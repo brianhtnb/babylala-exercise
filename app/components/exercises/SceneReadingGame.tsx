@@ -57,7 +57,7 @@ export function SceneReadingGame({ onComplete }: SceneReadingGameProps) {
   }, [state.currentIndex, state.isTransitioning]);
 
   const handleAnswer = useCallback(
-    (answer: boolean) => {
+    async (answer: boolean) => {
       if (state.selected !== null || state.isTransitioning) return;
       const correct = answer === q.answer;
       const newScore = correct ? state.score + 1 : state.score;
@@ -70,16 +70,21 @@ export function SceneReadingGame({ onComplete }: SceneReadingGameProps) {
         score: newScore,
       }));
 
-      setTimeout(() => {
-        const nextIndex = state.currentIndex + 1;
-        if (nextIndex >= total) { onComplete(newScore); return; }
-        setState({
-          currentIndex: nextIndex,
-          score: newScore,
-          selected: null,
-          isTransitioning: false,
-        });
-      }, 1300);
+      // Speak the sentence so the student always hears the correct reading
+      try {
+        await speak(q.sentence);
+      } catch { /* ignore */ }
+
+      await new Promise<void>((r) => setTimeout(r, 450));
+
+      const nextIndex = state.currentIndex + 1;
+      if (nextIndex >= total) { onComplete(newScore); return; }
+      setState({
+        currentIndex: nextIndex,
+        score: newScore,
+        selected: null,
+        isTransitioning: false,
+      });
     },
     [state, q, total, onComplete]
   );

@@ -112,7 +112,12 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
             isTransitioning: true,
             score: newScore,
           }));
-          setTimeout(() => moveToNext(newScore), 1800);
+          // Speak the word then wait before advancing
+          (async () => {
+            try { await speak(q.word); } catch { /* ignore */ }
+            await new Promise<void>((r) => setTimeout(r, 450));
+            moveToNext(newScore);
+          })();
         } else {
           setState((prev) => ({ ...prev, tiles: newTiles }));
         }
