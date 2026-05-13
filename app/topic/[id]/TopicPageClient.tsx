@@ -28,6 +28,16 @@ import type { GameConfig, ProgressData } from '@/types';
 import { cn } from '@/lib/utils';
 import { PAGE_CONTAINER, TYPOGRAPHY, ANIMATION_DURATIONS, SETTLE_IN } from '@/lib/design-tokens';
 
+/** Jungle-only decorative card backgrounds (public paths). */
+const JUNGLE_GAME_CARD_BACKGROUNDS: Partial<Record<GameConfig['type'], string>> = {
+  'vocab-intro': '/images/jungle/animals/monkey.png',
+  'listen-pick': '/images/jungle/animals/scene-frogs-crocodiles.png',
+  spelling: '/images/jungle/animals/bee.png',
+  'reading-quiz': '/images/jungle/animals/scene-bees-monkeys.png',
+  'count-complete': '/images/jungle/animals/panorama-counting.png',
+  'scene-reading': '/images/jungle/animals/panorama-yesno.png',
+};
+
 const GAME_VISUALS: Record<
   GameConfig['type'],
   { shell: string; iconWrap: string; iconClass: string; Icon: LucideIcon }
@@ -195,7 +205,7 @@ export default function TopicPageClient() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
           {topic.games.map((game, index) => {
             const gameProgress = progress
               ? getGameProgress(progress, topicId, game.id)
@@ -204,10 +214,13 @@ export default function TopicPageClient() {
             const isLocked = false;
             const visual = GAME_VISUALS[game.type];
             const GameIcon = visual.Icon;
+            const cardBg =
+              isJungleTopic ? JUNGLE_GAME_CARD_BACKGROUNDS[game.type] : undefined;
 
             return (
               <motion.div
                 key={game.id}
+                className="h-full min-h-[308px] md:min-h-[328px]"
                 initial={SETTLE_IN.initial}
                 animate={SETTLE_IN.animate}
                 transition={{ ...SETTLE_IN.transition, delay: index * ANIMATION_DURATIONS.stagger }}
@@ -216,46 +229,131 @@ export default function TopicPageClient() {
                   asDiv
                   onClick={() => handleGameClick(game.id)}
                   locked={isLocked}
-                  className={cn('border-2', visual.shell)}
+                  className={cn(
+                    'h-full min-h-[inherit] overflow-hidden flex flex-col rounded-2xl',
+                    cardBg
+                      ? 'border border-dm-border shadow-nexus-md !p-0 ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
+                      : cn('border-2', visual.shell)
+                  )}
                 >
-                  <div className="flex flex-col items-center text-center">
-                    <div
-                      className={cn(
-                        'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border-2 shadow-nexus-sm',
-                        visual.iconWrap
-                      )}
-                      aria-hidden
-                    >
-                      <GameIcon className={cn('h-8 w-8', visual.iconClass)} strokeWidth={2} />
-                    </div>
-
-                    <h2 className={cn(TYPOGRAPHY.cardTitle, 'text-xl mb-2')}>{game.title}</h2>
-
-                    <p className={cn(TYPOGRAPHY.body, 'mb-4')}>{game.description}</p>
-
-                    <div className="flex items-center gap-2">
-                      {gameProgress.completed ? (
-                        <>
-                          <StarDisplay stars={gameProgress.stars} size="sm" />
-                          <span className="text-success text-2xl" aria-label="Completed">
-                            ✓
-                          </span>
-                        </>
-                      ) : isLocked ? (
-                        <span className={cn(TYPOGRAPHY.body, 'text-content-muted')}>🔒 Locked</span>
-                      ) : (
-                        <span
+                  {cardBg ? (
+                    <>
+                      {/* Hero strip: full-color art, no heavy wash */}
+                      <div className="relative h-[9.5rem] sm:h-40 md:h-44 w-full shrink-0 overflow-hidden bg-surface-secondary">
+                        <Image
+                          src={cardBg}
+                          alt=""
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 768px) 100vw, 448px"
+                          priority={index < 2}
+                          aria-hidden
+                        />
+                        <div
+                          className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/[0.12] to-transparent dark:from-black/[0.28]"
+                          aria-hidden
+                        />
+                      </div>
+                      {/* Content block: readable surface, icon overlaps hero */}
+                      <div className="relative flex flex-1 flex-col min-h-0 bg-surface px-4 pb-4 pt-0 sm:px-5 sm:pb-5 border-t border-dm-border/60">
+                        <div className="flex justify-center -mt-8 mb-2 relative z-10">
+                          <div
+                            className={cn(
+                              'flex h-14 w-14 items-center justify-center rounded-2xl border-2 shadow-nexus-md',
+                              'bg-surface ring-[3px] ring-surface',
+                              visual.iconWrap
+                            )}
+                            aria-hidden
+                          >
+                            <GameIcon className={cn('h-7 w-7', visual.iconClass)} strokeWidth={2} />
+                          </div>
+                        </div>
+                        <h2
                           className={cn(
-                            TYPOGRAPHY.control,
-                            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
-                            'bg-primary text-white text-sm'
+                            TYPOGRAPHY.cardTitle,
+                            'text-center text-lg sm:text-xl mb-1.5 line-clamp-2'
                           )}
                         >
-                          Play Now!
-                        </span>
-                      )}
+                          {game.title}
+                        </h2>
+                        <p
+                          className={cn(
+                            TYPOGRAPHY.body,
+                            'text-center text-content-secondary text-sm sm:text-base leading-snug line-clamp-3 text-balance grow mb-3'
+                          )}
+                        >
+                          {game.description}
+                        </p>
+                        <div className="mt-auto flex items-center justify-center gap-2 pt-1">
+                          {gameProgress.completed ? (
+                            <>
+                              <StarDisplay stars={gameProgress.stars} size="sm" />
+                              <span className="text-success text-2xl" aria-label="Completed">
+                                ✓
+                              </span>
+                            </>
+                          ) : isLocked ? (
+                            <span className={cn(TYPOGRAPHY.body, 'text-content-muted')}>🔒 Locked</span>
+                          ) : (
+                            <span
+                              className={cn(
+                                TYPOGRAPHY.control,
+                                'inline-flex items-center gap-1.5 px-4 py-2 rounded-xl',
+                                'bg-primary text-white text-sm shadow-nexus-sm'
+                              )}
+                            >
+                              Play Now!
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col h-full min-h-0 items-center text-center">
+                      <div
+                        className={cn(
+                          'mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border-2 shadow-nexus-sm shrink-0',
+                          visual.iconWrap
+                        )}
+                        aria-hidden
+                      >
+                        <GameIcon className={cn('h-8 w-8', visual.iconClass)} strokeWidth={2} />
+                      </div>
+                      <h2 className={cn(TYPOGRAPHY.cardTitle, 'text-xl mb-2 line-clamp-2')}>
+                        {game.title}
+                      </h2>
+                      <p
+                        className={cn(
+                          TYPOGRAPHY.body,
+                          'mb-4 line-clamp-3 text-balance text-content-secondary flex-1'
+                        )}
+                      >
+                        {game.description}
+                      </p>
+                      <div className="mt-auto flex items-center justify-center gap-2 shrink-0 w-full pt-2">
+                        {gameProgress.completed ? (
+                          <>
+                            <StarDisplay stars={gameProgress.stars} size="sm" />
+                            <span className="text-success text-2xl" aria-label="Completed">
+                              ✓
+                            </span>
+                          </>
+                        ) : isLocked ? (
+                          <span className={cn(TYPOGRAPHY.body, 'text-content-muted')}>🔒 Locked</span>
+                        ) : (
+                          <span
+                            className={cn(
+                              TYPOGRAPHY.control,
+                              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
+                              'bg-primary text-white text-sm shadow-nexus-sm'
+                            )}
+                          >
+                            Play Now!
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </Card>
               </motion.div>
             );
