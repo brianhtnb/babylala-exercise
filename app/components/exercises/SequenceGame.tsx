@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
-import { speak, playEffect, initAudio } from '@/lib/audio';
+import { speak, stopSpeaking, playEffect, initAudio } from '@/lib/audio';
 import { generateSequenceProblems } from '@/topics/numbers-11-20/games/sequence';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,7 @@ export function SequenceGame({ onComplete }: SequenceGameProps) {
   // Speak the question when a new problem is shown
   useEffect(() => {
     if (!gameState.isTransitioning && !gameState.answered) {
+      stopSpeaking();
       speak('What number is missing?').catch(() => {});
     }
   }, [currentProblem, gameState.isTransitioning, gameState.answered]);

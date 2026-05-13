@@ -7,7 +7,7 @@ import { getTopicProgress } from '@/lib/storage';
 import { Card } from '../common/Card';
 import { StarDisplay } from '../common/StarDisplay';
 import { ProgressBar } from '../common/ProgressBar';
-import { speak, playEffect } from '@/lib/audio';
+import { playEffect } from '@/lib/audio';
 import { cn } from '@/lib/utils';
 import { TYPOGRAPHY, ANIMATION_DURATIONS, SETTLE_IN } from '@/lib/design-tokens';
 
@@ -21,7 +21,6 @@ export function TopicGrid({ topics, progress }: TopicGridProps) {
 
   const handleTopicClick = (topic: TopicConfig) => {
     playEffect('click').catch(() => {});
-    speak(`Let's learn ${topic.title}!`).catch(() => {});
     router.push(`/topic/${topic.id}`);
   };
 

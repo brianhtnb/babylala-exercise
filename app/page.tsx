@@ -7,7 +7,7 @@ import { Header } from './components/layout/Header';
 import { TopicGrid } from './components/layout/TopicGrid';
 import { loadProgress, defaultProgressData, getTotalStars } from '@/lib/storage';
 import { getAllTopics } from '@/topics';
-import { speak, initAudio } from '@/lib/audio';
+import { speak, stopSpeaking, initAudio } from '@/lib/audio';
 import { PAGE_CONTAINER, TYPOGRAPHY, SETTLE_IN } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +26,7 @@ export default function Home() {
     if (!hasInteracted) {
       setHasInteracted(true);
       initAudio();
+      stopSpeaking(); // cancel any leftover speech from a previous page
       speak('Welcome to Babylala! Choose a topic to start learning!');
     }
   }, [hasInteracted]);

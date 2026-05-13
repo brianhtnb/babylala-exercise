@@ -6,10 +6,10 @@ import { motion } from 'framer-motion';
 import { Header } from '@/app/components/layout/Header';
 import { Card } from '@/app/components/common/Card';
 import { StarDisplay } from '@/app/components/common/StarDisplay';
-import { Button } from '@/app/components/common/Button';
+
 import { getTopicById } from '@/topics';
 import { loadProgress, getGameProgress } from '@/lib/storage';
-import { speak, playEffect } from '@/lib/audio';
+import { speak, stopSpeaking, playEffect } from '@/lib/audio';
 import { ProgressData } from '@/types';
 import { cn } from '@/lib/utils';
 import { PAGE_CONTAINER, TYPOGRAPHY, ANIMATION_DURATIONS, SETTLE_IN } from '@/lib/design-tokens';
@@ -24,6 +24,7 @@ export default function TopicPageClient() {
 
   useEffect(() => {
     setProgress(loadProgress());
+    stopSpeaking(); // cancel anything still playing from previous page
     if (topic) {
       speak(`Welcome to ${topic.title}! Choose a game to play!`);
     }
@@ -95,6 +96,7 @@ export default function TopicPageClient() {
                 transition={{ ...SETTLE_IN.transition, delay: index * ANIMATION_DURATIONS.stagger }}
               >
                 <Card
+                  asDiv
                   onClick={() => handleGameClick(game.id)}
                   locked={isLocked}
                   className={cn('border-2', gameShell[game.type] ?? 'border-dm-border')}
@@ -122,9 +124,15 @@ export default function TopicPageClient() {
                       ) : isLocked ? (
                         <span className={cn(TYPOGRAPHY.body, 'text-content-muted')}>🔒 Locked</span>
                       ) : (
-                        <Button size="sm" sound={false}>
+                        <span
+                          className={cn(
+                            TYPOGRAPHY.control,
+                            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg',
+                            'bg-primary text-white text-sm'
+                          )}
+                        >
                           Play Now!
-                        </Button>
+                        </span>
                       )}
                     </div>
                   </div>

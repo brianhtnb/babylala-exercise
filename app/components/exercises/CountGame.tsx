@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CountingItem } from '@/types';
 import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
-import { speak, playEffect, initAudio } from '@/lib/audio';
+import { speak, stopSpeaking, playEffect, initAudio } from '@/lib/audio';
 import { getCountingItems, generateAnswerOptions } from '@/topics/numbers-11-20/games/counting';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
@@ -42,6 +42,7 @@ export function CountGame({ onComplete }: CountGameProps) {
 
   useEffect(() => {
     if (!gameState.isTransitioning && !gameState.answered) {
+      stopSpeaking();
       speak(`How many ${currentItem.name} are there?`).catch(() => {});
     }
   }, [currentItem, gameState.isTransitioning, gameState.answered]);
