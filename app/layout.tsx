@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import './globals.css';
+import { AppShell } from './components/layout/AppShell';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -29,7 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={manrope.variable}>
-      <body className={`${manrope.className} antialiased`}>{children}</body>
+      <body className={`${manrope.className} antialiased`}>
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

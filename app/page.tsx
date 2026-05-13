@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ProgressData } from '@/types';
-import { Header } from './components/layout/Header';
 import { TopicGrid } from './components/layout/TopicGrid';
 import { loadProgress, defaultProgressData, getTotalStars } from '@/lib/storage';
 import { getAllTopics } from '@/topics';
@@ -53,8 +52,6 @@ export default function Home() {
       onClick={handleInteraction}
       onTouchStart={handleInteraction}
     >
-      <Header title="Babylala Exercise" />
-
       <main className={PAGE_CONTAINER}>
         <motion.div
           initial={SETTLE_IN.initial}

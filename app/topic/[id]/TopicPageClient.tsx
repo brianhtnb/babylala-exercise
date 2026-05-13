@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Header } from '@/app/components/layout/Header';
+import { ChevronLeft } from 'lucide-react';
 import { Card } from '@/app/components/common/Card';
 import { StarDisplay } from '@/app/components/common/StarDisplay';
 
@@ -56,9 +56,19 @@ export default function TopicPageClient() {
 
   return (
     <div className="min-h-screen bg-app">
-      <Header title={topic.title} showBack onBack={handleBack} />
-
       <main className={PAGE_CONTAINER}>
+        {/* Inline back nav */}
+        <div className="flex items-center gap-3 mb-8">
+          <button
+            onClick={handleBack}
+            aria-label="Back to topics"
+            className="w-9 h-9 rounded-lg bg-surface-secondary border border-dm-border flex items-center justify-center text-content-muted hover:text-content hover:border-primary/30 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className={cn(TYPOGRAPHY.label, 'text-content-muted')}>All Topics</span>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}

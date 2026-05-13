@@ -104,7 +104,9 @@ async function playStarSound(): Promise<void> {
 // ElevenLabs TTS — primary
 // ---------------------------------------------------------------------------
 
-/** Client-side AudioBuffer cache — eliminates repeated /api/tts calls. */
+import { loadVoicePrefs } from '@/lib/voice-settings';
+
+/** Client-side AudioBuffer cache — key: `${voiceId ?? 'auto'}:${text}` */
 const ttsCache = new Map<string, AudioBuffer>();
 
 /** Currently playing source node — kept so stopSpeaking() can stop it. */
@@ -113,13 +115,14 @@ let activeSource: AudioBufferSourceNode | null = null;
 /** AbortController for the in-flight /api/tts fetch. */
 let activeFetchController: AbortController | null = null;
 
-/** Play a decoded AudioBuffer through the shared AudioContext. */
-function playAudioBuffer(buffer: AudioBuffer): Promise<void> {
+/** Play a decoded AudioBuffer, optionally at adjusted speed. */
+function playAudioBuffer(buffer: AudioBuffer, speed = 1.0): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
       const ctx = getAudioContext();
       const source = ctx.createBufferSource();
       source.buffer = buffer;
+      source.playbackRate.value = Math.max(0.5, Math.min(2.0, speed));
       source.connect(ctx.destination);
       activeSource = source;
       source.onended = () => {
@@ -137,31 +140,39 @@ function playAudioBuffer(buffer: AudioBuffer): Promise<void> {
 /**
  * Fetch audio from /api/tts, decode, cache, then play.
  * Throws on failure so the caller can fall back to Web Speech.
- * Respects cancellation via AbortController.
+ * voiceId: explicit voice to use (bypasses auto-detection).
+ * speed: playback rate applied client-side via AudioBufferSourceNode.
  */
-async function speakElevenLabs(text: string): Promise<void> {
-  // Serve from cache — no network needed
-  const cached = ttsCache.get(text);
+async function speakElevenLabs(
+  text: string,
+  voiceId?: string | null,
+  speed = 1.0
+): Promise<void> {
+  const cacheKey = `${voiceId ?? 'auto'}:${text}`;
+
+  const cached = ttsCache.get(cacheKey);
   if (cached) {
-    await playAudioBuffer(cached);
+    await playAudioBuffer(cached, speed);
     return;
   }
 
-  // Start a cancellable fetch
   const controller = new AbortController();
   activeFetchController = controller;
 
   let res: Response;
   try {
+    const body: Record<string, unknown> = { text };
+    if (voiceId) body.voiceId = voiceId;
+
     res = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
   } catch (err) {
     activeFetchController = null;
-    if (err instanceof Error && err.name === 'AbortError') return; // cancelled cleanly
+    if (err instanceof Error && err.name === 'AbortError') return;
     throw err;
   }
   activeFetchController = null;
@@ -172,8 +183,8 @@ async function speakElevenLabs(text: string): Promise<void> {
   const ctx = getAudioContext();
   const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
 
-  ttsCache.set(text, audioBuffer);
-  await playAudioBuffer(audioBuffer);
+  ttsCache.set(cacheKey, audioBuffer);
+  await playAudioBuffer(audioBuffer, speed);
 }
 
 // ---------------------------------------------------------------------------
@@ -284,17 +295,17 @@ export function speak(text: string): Promise<void> {
   const key = text.trim();
   if (!key) return Promise.resolve();
 
-  // Return the existing promise if the same text is already being spoken
   const existing = inFlight.get(key);
   if (existing) return existing;
 
   const promise = (async () => {
     initAudio();
+    const prefs = loadVoicePrefs();
     try {
-      await speakElevenLabs(key);
+      await speakElevenLabs(key, prefs.voiceId, prefs.speed);
     } catch (err) {
       console.warn('[TTS] ElevenLabs unavailable, falling back to Web Speech:', err);
-      await speakWebSpeech(key);
+      await speakWebSpeech(key, prefs.speed * 0.9); // scale to Web Speech rate range
     }
   })().finally(() => {
     inFlight.delete(key);
@@ -302,6 +313,17 @@ export function speak(text: string): Promise<void> {
 
   inFlight.set(key, promise);
   return promise;
+}
+
+/**
+ * Play a short preview of a specific ElevenLabs voice at the given speed.
+ * Used from the Settings page — bypasses normal prefs and deduplication.
+ */
+export async function previewVoice(voiceId: string, speed: number): Promise<void> {
+  stopSpeaking();
+  initAudio();
+  const sample = "Hello! Welcome to Babylala Exercise!";
+  await speakElevenLabs(sample, voiceId, speed);
 }
 
 /**

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/app/components/layout/Header';
+import { ChevronLeft } from 'lucide-react';
 import { CountGame } from '@/app/components/exercises/CountGame';
 import { SequenceGame } from '@/app/components/exercises/SequenceGame';
 import { TraceGame } from '@/app/components/exercises/TraceGame';
@@ -104,9 +104,18 @@ export default function ExercisePageClient() {
 
   return (
     <div className="min-h-screen bg-app">
-      <Header title={game.title} showBack onBack={handleBackToTopic} />
-
       <main className={cn(PAGE_CONTAINER, 'py-4')}>
+        {/* Inline back nav */}
+        <div className="flex items-center gap-3 mb-5">
+          <button
+            onClick={handleBackToTopic}
+            aria-label="Back to topic"
+            className="w-9 h-9 rounded-lg bg-surface-secondary border border-dm-border flex items-center justify-center text-content-muted hover:text-content hover:border-primary/30 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <h1 className={cn(TYPOGRAPHY.pageTitle, 'text-xl md:text-2xl')}>{game.title}</h1>
+        </div>
         <AnimatePresence mode="wait">
           {gameState === 'playing' ? (
             <motion.div
@@ -143,3 +152,4 @@ export default function ExercisePageClient() {
     </div>
   );
 }
+

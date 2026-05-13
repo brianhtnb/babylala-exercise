@@ -93,9 +93,11 @@ export async function POST(req: NextRequest) {
   }
 
   let text: string;
+  let requestedVoiceId: string | undefined;
   try {
     const body = await req.json();
     text = (body.text ?? '').trim();
+    requestedVoiceId = body.voiceId ?? undefined;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
@@ -103,7 +105,8 @@ export async function POST(req: NextRequest) {
   if (!text) return NextResponse.json({ error: 'text is required' }, { status: 400 });
   if (text.length > 500) return NextResponse.json({ error: 'text too long (max 500)' }, { status: 400 });
 
-  const voiceId = await resolveVoiceId(apiKey);
+  // voiceId from request body (e.g. preview / user prefs) takes priority over auto-detection
+  const voiceId = requestedVoiceId ?? (await resolveVoiceId(apiKey));
   if (!voiceId) {
     console.error('[TTS API] Could not resolve a usable voice ID — aborting TTS request');
     return NextResponse.json({ error: 'No usable ElevenLabs voice found' }, { status: 502 });

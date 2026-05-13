@@ -12,6 +12,7 @@ export const TYPOGRAPHY = {
   body: 'type-card-body',
   caption: 'type-caption',
   eyebrow: 'type-eyebrow',
+  label: 'type-eyebrow',
   metric: 'type-metric',
   control: 'type-control',
 } as const;
