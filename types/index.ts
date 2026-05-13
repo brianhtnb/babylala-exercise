@@ -1,10 +1,34 @@
 export interface GameConfig {
   id: string;
-  type: 'counting' | 'sequence' | 'writing' | 'dialogue';
+  type: 'counting' | 'sequence' | 'writing' | 'dialogue' | 'spelling' | 'reading-quiz' | 'count-complete';
   title: string;
   description: string;
   difficulty: 1 | 2 | 3;
   dependsOn?: string[];
+}
+
+/* ── Jungle game data types ─────────────────────────────────── */
+
+export interface SpellingQuestion {
+  word: string;
+  emoji: string;
+  /** Letters displayed to the player — some are correct, some redundant */
+  letters: { char: string; isRedundant: boolean }[];
+}
+
+export interface ReadingQuestion {
+  emoji: string;
+  sentence: string;
+  answer: boolean;
+}
+
+export interface CountCompleteQuestion {
+  emojiChar: string;
+  count: number;
+  /** Sentence with "___" as the blank to fill */
+  sentence: string;
+  options: string[];
+  answer: string;
 }
 
 export interface TopicConfig {

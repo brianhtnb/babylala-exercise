@@ -8,6 +8,9 @@ import { CountGame } from '@/app/components/exercises/CountGame';
 import { SequenceGame } from '@/app/components/exercises/SequenceGame';
 import { TraceGame } from '@/app/components/exercises/TraceGame';
 import { RolePlayGame } from '@/app/components/exercises/RolePlayGame';
+import { SpellingGame } from '@/app/components/exercises/SpellingGame';
+import { ReadingQuizGame } from '@/app/components/exercises/ReadingQuizGame';
+import { CountAndCompleteGame } from '@/app/components/exercises/CountAndCompleteGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
@@ -82,6 +85,12 @@ export default function ExercisePageClient() {
         return <TraceGame onComplete={handleGameComplete} />;
       case 'dialogue':
         return <RolePlayGame onComplete={handleGameComplete} />;
+      case 'spelling':
+        return <SpellingGame onComplete={handleGameComplete} />;
+      case 'reading-quiz':
+        return <ReadingQuizGame onComplete={handleGameComplete} />;
+      case 'count-complete':
+        return <CountAndCompleteGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
     }
@@ -89,16 +98,14 @@ export default function ExercisePageClient() {
 
   const getTotalQuestions = () => {
     switch (game.type) {
-      case 'counting':
-        return 10;
-      case 'sequence':
-        return 8;
-      case 'writing':
-        return 10;
-      case 'dialogue':
-        return 5;
-      default:
-        return 10;
+      case 'counting':   return 10;
+      case 'sequence':   return 8;
+      case 'writing':    return 10;
+      case 'dialogue':   return 5;
+      case 'spelling':   return 10;
+      case 'reading-quiz': return 10;
+      case 'count-complete': return 8;
+      default:           return 10;
     }
   };
 

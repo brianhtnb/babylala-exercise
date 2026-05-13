@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 interface SpeechButtonProps {
   text: string;
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function SpeechButton({ text, className, children }: SpeechButtonProps) {
