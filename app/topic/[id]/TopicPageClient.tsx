@@ -8,6 +8,7 @@ import {
   BarChart3,
   Calculator,
   ChevronLeft,
+  ClipboardCheck,
   Hash,
   Headphones,
   Images,
@@ -39,6 +40,7 @@ const JUNGLE_GAME_CARD_BACKGROUNDS: Partial<Record<GameConfig['type'], string>> 
   'count-complete': '/images/jungle/animals/panorama-counting.png',
   'scene-reading': '/images/jungle/animals/panorama-yesno.png',
   'speaking-present': '/images/jungle/speaking-present/scenario-1.png',
+  'final-checkpoint': '/images/jungle/speaking-present/scenario-3.png',
 };
 
 const GAME_VISUALS: Record<
@@ -111,6 +113,13 @@ const GAME_VISUALS: Record<
     iconWrap: 'border-primary/35 bg-primary/[0.12]',
     iconClass: 'text-primary',
     Icon: Mic2,
+  },
+  'final-checkpoint': {
+    shell:
+      'bg-gradient-to-br from-info/[0.12] via-primary/[0.08] to-success/[0.10] border-primary/40 ring-1 ring-primary/15',
+    iconWrap: 'border-primary/40 bg-primary/[0.1]',
+    iconClass: 'text-primary',
+    Icon: ClipboardCheck,
   },
 };
 
@@ -221,10 +230,20 @@ export default function TopicPageClient() {
               ? getGameProgress(progress, topicId, game.id)
               : { completed: false, stars: 0 };
 
-            const isLocked = false;
+            const isFinaleGame = game.type === 'speaking-present';
+            const isCheckpointGame = game.type === 'final-checkpoint';
+            const isCapstoneWide = isFinaleGame || isCheckpointGame;
+            const isLocked =
+              Boolean(
+                game.dependsOn &&
+                  game.dependsOn.length > 0 &&
+                  (!progress ||
+                    !game.dependsOn.every((depId) =>
+                      getGameProgress(progress, topicId, depId).completed
+                    ))
+              );
             const visual = GAME_VISUALS[game.type];
             const GameIcon = visual.Icon;
-            const isFinaleGame = game.type === 'speaking-present';
             const cardBg =
               isJungleTopic ? JUNGLE_GAME_CARD_BACKGROUNDS[game.type] : undefined;
 
@@ -233,7 +252,7 @@ export default function TopicPageClient() {
                 key={game.id}
                 className={cn(
                   'h-full min-h-[308px] md:min-h-[328px]',
-                  isFinaleGame && 'md:col-span-2'
+                  isCapstoneWide && 'md:col-span-2'
                 )}
                 initial={SETTLE_IN.initial}
                 animate={SETTLE_IN.animate}
@@ -248,7 +267,7 @@ export default function TopicPageClient() {
                     cardBg
                       ? cn(
                           'shadow-nexus-md !p-0 ring-1 ring-black/[0.04] dark:ring-white/[0.06]',
-                          isFinaleGame
+                          isFinaleGame || isCheckpointGame
                             ? 'border-2 border-primary/35 ring-2 ring-primary/20 md:rounded-3xl'
                             : 'border border-dm-border'
                         )
@@ -261,7 +280,7 @@ export default function TopicPageClient() {
                       <div
                         className={cn(
                           'relative w-full shrink-0 overflow-hidden bg-surface-secondary',
-                          isFinaleGame
+                          isCapstoneWide
                             ? 'h-[10.5rem] sm:h-44 md:h-52'
                             : 'h-[9.5rem] sm:h-40 md:h-44'
                         )}
@@ -272,7 +291,7 @@ export default function TopicPageClient() {
                           fill
                           className="object-cover object-center"
                           sizes={
-                            isFinaleGame
+                            isCapstoneWide
                               ? '(max-width: 768px) 100vw, 896px'
                               : '(max-width: 768px) 100vw, 448px'
                           }
@@ -308,6 +327,18 @@ export default function TopicPageClient() {
                             >
                               <Sparkles className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
                               Grand finale
+                            </span>
+                          </div>
+                        ) : isCheckpointGame ? (
+                          <div className="flex justify-center px-2 -mt-1 mb-1 relative z-10">
+                            <span
+                              className={cn(
+                                TYPOGRAPHY.label,
+                                'inline-flex items-center gap-1.5 rounded-full border border-info/45 bg-info-light px-3 py-1 text-info'
+                              )}
+                            >
+                              <ClipboardCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+                              Topic check
                             </span>
                           </div>
                         ) : null}
@@ -371,6 +402,16 @@ export default function TopicPageClient() {
                         >
                           <Sparkles className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
                           Grand finale
+                        </span>
+                      ) : isCheckpointGame ? (
+                        <span
+                          className={cn(
+                            TYPOGRAPHY.label,
+                            'inline-flex items-center gap-1.5 rounded-full border border-info/45 bg-info-light px-3 py-1 text-info mb-2'
+                          )}
+                        >
+                          <ClipboardCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+                          Topic check
                         </span>
                       ) : null}
                       <h2 className={cn(TYPOGRAPHY.cardTitle, 'text-xl mb-2 line-clamp-2')}>

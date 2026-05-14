@@ -15,9 +15,11 @@ import { SceneReadingGame } from '@/app/components/exercises/SceneReadingGame';
 import { VocabIntroGame } from '@/app/components/exercises/VocabIntroGame';
 import { ListenPickGame } from '@/app/components/exercises/ListenPickGame';
 import { SpeakingPresentationGame } from '@/app/components/exercises/SpeakingPresentationGame';
+import { FinalCheckpointGame } from '@/app/components/exercises/FinalCheckpointGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
-import { loadProgress, saveProgress, updateGameProgress } from '@/lib/storage';
+import { jungleCheckpointItems } from '@/topics/jungle/games/final-checkpoint';
+import { loadProgress, saveProgress, updateGameProgress, getGameProgress } from '@/lib/storage';
 import { PAGE_CONTAINER, TYPOGRAPHY, FADE_IN } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +39,36 @@ export default function ExercisePageClient() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-app">
         <p className={TYPOGRAPHY.pageTitle}>Game not found!</p>
+      </div>
+    );
+  }
+
+  const progressSnapshot = loadProgress();
+  const prereqBlocked =
+    Boolean(
+      game.dependsOn &&
+        game.dependsOn.length > 0 &&
+        !game.dependsOn.every((depId) =>
+          getGameProgress(progressSnapshot, topicId, depId).completed
+        )
+    );
+
+  if (prereqBlocked) {
+    return (
+      <div className="min-h-screen bg-app">
+        <main className={cn(PAGE_CONTAINER, 'py-8 max-w-lg mx-auto text-center space-y-4')}>
+          <p className={cn(TYPOGRAPHY.pageTitle, 'text-xl')}>Not yet available</p>
+          <p className={cn(TYPOGRAPHY.body, 'text-content-secondary')}>
+            Finish the other games in this topic first, then come back here.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(`/topic/${topicId}`)}
+            className={cn(TYPOGRAPHY.control, 'rounded-xl bg-primary px-5 py-2.5 text-white shadow-nexus-sm')}
+          >
+            Back to topic
+          </button>
+        </main>
       </div>
     );
   }
@@ -65,6 +97,8 @@ export default function ExercisePageClient() {
         return 8;
       case 'speaking-present':
         return 1;
+      case 'final-checkpoint':
+        return jungleCheckpointItems.length;
       default:
         return 10;
     }
@@ -131,6 +165,8 @@ export default function ExercisePageClient() {
         return <SceneReadingGame onComplete={handleGameComplete} />;
       case 'speaking-present':
         return <SpeakingPresentationGame onComplete={handleGameComplete} />;
+      case 'final-checkpoint':
+        return <FinalCheckpointGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
     }

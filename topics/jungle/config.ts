@@ -67,5 +67,13 @@ export const jungleConfig: TopicConfig = {
       difficulty: 3,
       dependsOn: ['jungle-count', 'jungle-scene'],
     },
+    {
+      id: 'jungle-checkpoint',
+      type: 'final-checkpoint',
+      title: 'Topic Check',
+      description: 'Final review: listening, reading, writing, and a short speaking task!',
+      difficulty: 3,
+      dependsOn: ['jungle-speaking'],
+    },
   ],
 };
