@@ -36,18 +36,18 @@ export const countCompleteQuestions: CountCompleteQuestion[] = [
     animal: 'lizard',
     sentence: 'There are ___ lizards in the jungle.',
     options: ['two', 'three', 'four', 'five'],
-    answer: 'four',
+    answer: 'five',
   },
   {
     animal: 'bee',
     sentence: 'There are ___ bees in the jungle.',
-    options: ['three', 'four', 'five', 'six'],
-    answer: 'four',
+    options: ['seven', 'eight', 'nine', 'ten'],
+    answer: 'ten',
   },
   {
     animal: 'spider',
     sentence: 'There are ___ spiders in the jungle.',
     options: ['three', 'four', 'five', 'six'],
-    answer: 'five',
+    answer: 'six',
   },
 ];

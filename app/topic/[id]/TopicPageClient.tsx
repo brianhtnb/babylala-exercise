@@ -16,6 +16,7 @@ import {
   MessageCircle,
   Mic2,
   Pencil,
+  Sparkles,
   SpellCheck,
   type LucideIcon,
 } from 'lucide-react';
@@ -105,9 +106,10 @@ const GAME_VISUALS: Record<
     Icon: Map,
   },
   'speaking-present': {
-    shell: 'bg-secondary/10 border-secondary/40',
-    iconWrap: 'border-secondary/35 bg-secondary/10',
-    iconClass: 'text-secondary',
+    shell:
+      'bg-gradient-to-br from-primary/[0.14] via-primary/[0.07] to-warning/[0.10] border-primary/40 shadow-[0_0_0_1px_rgba(124,58,237,0.12)]',
+    iconWrap: 'border-primary/35 bg-primary/[0.12]',
+    iconClass: 'text-primary',
     Icon: Mic2,
   },
 };
@@ -175,13 +177,13 @@ export default function TopicPageClient() {
           className="text-center mb-12"
         >
           {topic.heroImage ? (
-            <div className="relative mb-8 max-w-3xl mx-auto h-40 sm:h-44 md:h-52 rounded-2xl overflow-hidden border border-dm-border shadow-nexus-md isolate">
+            <div className="relative mb-8 w-full max-w-5xl mx-auto h-48 sm:h-56 md:h-64 lg:h-[17rem] rounded-2xl md:rounded-3xl overflow-hidden border border-dm-border shadow-nexus-md isolate">
               <Image
                 src={topic.heroImage}
                 alt=""
                 fill
                 className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 896px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 1024px"
                 priority
                 aria-hidden
               />
@@ -222,13 +224,17 @@ export default function TopicPageClient() {
             const isLocked = false;
             const visual = GAME_VISUALS[game.type];
             const GameIcon = visual.Icon;
+            const isFinaleGame = game.type === 'speaking-present';
             const cardBg =
               isJungleTopic ? JUNGLE_GAME_CARD_BACKGROUNDS[game.type] : undefined;
 
             return (
               <motion.div
                 key={game.id}
-                className="h-full min-h-[308px] md:min-h-[328px]"
+                className={cn(
+                  'h-full min-h-[308px] md:min-h-[328px]',
+                  isFinaleGame && 'md:col-span-2'
+                )}
                 initial={SETTLE_IN.initial}
                 animate={SETTLE_IN.animate}
                 transition={{ ...SETTLE_IN.transition, delay: index * ANIMATION_DURATIONS.stagger }}
@@ -240,20 +246,36 @@ export default function TopicPageClient() {
                   className={cn(
                     'h-full min-h-[inherit] overflow-hidden flex flex-col rounded-2xl',
                     cardBg
-                      ? 'border border-dm-border shadow-nexus-md !p-0 ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
+                      ? cn(
+                          'shadow-nexus-md !p-0 ring-1 ring-black/[0.04] dark:ring-white/[0.06]',
+                          isFinaleGame
+                            ? 'border-2 border-primary/35 ring-2 ring-primary/20 md:rounded-3xl'
+                            : 'border border-dm-border'
+                        )
                       : cn('border-2', visual.shell)
                   )}
                 >
                   {cardBg ? (
                     <>
                       {/* Hero strip: full-color art, no heavy wash */}
-                      <div className="relative h-[9.5rem] sm:h-40 md:h-44 w-full shrink-0 overflow-hidden bg-surface-secondary">
+                      <div
+                        className={cn(
+                          'relative w-full shrink-0 overflow-hidden bg-surface-secondary',
+                          isFinaleGame
+                            ? 'h-[10.5rem] sm:h-44 md:h-52'
+                            : 'h-[9.5rem] sm:h-40 md:h-44'
+                        )}
+                      >
                         <Image
                           src={cardBg}
                           alt=""
                           fill
                           className="object-cover object-center"
-                          sizes="(max-width: 768px) 100vw, 448px"
+                          sizes={
+                            isFinaleGame
+                              ? '(max-width: 768px) 100vw, 896px'
+                              : '(max-width: 768px) 100vw, 448px'
+                          }
                           priority={index < 2}
                           aria-hidden
                         />
@@ -276,6 +298,19 @@ export default function TopicPageClient() {
                             <GameIcon className={cn('h-7 w-7', visual.iconClass)} strokeWidth={2} />
                           </div>
                         </div>
+                        {isFinaleGame ? (
+                          <div className="flex justify-center px-2 -mt-1 mb-1 relative z-10">
+                            <span
+                              className={cn(
+                                TYPOGRAPHY.label,
+                                'inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-primary'
+                              )}
+                            >
+                              <Sparkles className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+                              Grand finale
+                            </span>
+                          </div>
+                        ) : null}
                         <h2
                           className={cn(
                             TYPOGRAPHY.cardTitle,
@@ -327,6 +362,17 @@ export default function TopicPageClient() {
                       >
                         <GameIcon className={cn('h-8 w-8', visual.iconClass)} strokeWidth={2} />
                       </div>
+                      {isFinaleGame ? (
+                        <span
+                          className={cn(
+                            TYPOGRAPHY.label,
+                            'inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-primary mb-2'
+                          )}
+                        >
+                          <Sparkles className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+                          Grand finale
+                        </span>
+                      ) : null}
                       <h2 className={cn(TYPOGRAPHY.cardTitle, 'text-xl mb-2 line-clamp-2')}>
                         {game.title}
                       </h2>
