@@ -18,7 +18,7 @@ import { SpeakingPresentationGame } from '@/app/components/exercises/SpeakingPre
 import { FinalCheckpointGame } from '@/app/components/exercises/FinalCheckpointGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
-import { jungleCheckpointItems } from '@/topics/jungle/games/final-checkpoint';
+import { JUNGLE_CHECKPOINT_ITEM_COUNT } from '@/topics/jungle/games/final-checkpoint';
 import { LISTEN_PICK_GAME_ROUND_COUNT } from '@/topics/jungle/games/listen-pick-image';
 import { SPELLING_GAME_ROUND_COUNT } from '@/topics/jungle/games/spelling';
 import { loadProgress, saveProgress, updateGameProgress, getGameProgress } from '@/lib/storage';
@@ -100,7 +100,7 @@ export default function ExercisePageClient() {
       case 'speaking-present':
         return 1;
       case 'final-checkpoint':
-        return jungleCheckpointItems.length;
+        return JUNGLE_CHECKPOINT_ITEM_COUNT;
       default:
         return 10;
     }

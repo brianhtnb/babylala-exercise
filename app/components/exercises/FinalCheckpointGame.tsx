@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ClipboardCheck, Headphones, Mic, PenLine, Square, Volume2 } from 'lucide-react';
 import { ProgressBar } from '@/app/components/common/ProgressBar';
 import { speak, stopSpeaking, playEffect, initAudio } from '@/lib/audio';
-import { jungleCheckpointItems } from '@/topics/jungle/games/final-checkpoint';
+import { buildJungleCheckpointSession } from '@/topics/jungle/games/final-checkpoint';
 import type {
   CheckpointItem,
   CheckpointListenItem,
@@ -21,9 +21,6 @@ import { cn } from '@/lib/utils';
 interface FinalCheckpointGameProps {
   onComplete: (score: number) => void;
 }
-
-const ITEMS = jungleCheckpointItems;
-const TOTAL = ITEMS.length;
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -85,11 +82,13 @@ function buildWriteTiles(q: CheckpointWriteExtraItem): WriteTileState[] {
 }
 
 export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
+  const [items] = useState(() => buildJungleCheckpointSession());
+  const total = items.length;
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
 
-  const item = ITEMS[index];
+  const item = items[index]!;
   const SkillIcon = skillIcon(item.skill);
 
   const [listenSelected, setListenSelected] = useState<'a' | 'b' | 'c' | null>(null);
@@ -130,7 +129,7 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
   }, []);
 
   useEffect(() => {
-    const q = ITEMS[index];
+    const q = items[index]!;
     setListenSelected(null);
     setListenWrong(null);
     setReadSelected(null);
@@ -166,7 +165,7 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
     setIsRecording(false);
     revokeRecordedUrl();
     setRecordError(null);
-  }, [index, revokeRecordedUrl]);
+  }, [index, items, revokeRecordedUrl]);
 
   useEffect(() => {
     return () => {
@@ -186,7 +185,7 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
   useEffect(() => {
     if (transitioning) return;
     stopSpeaking();
-    const q = ITEMS[index];
+    const q = items[index]!;
     if (q.skill === 'listen') {
       void speak(q.question);
     } else if (q.skill === 'read') {
@@ -199,13 +198,13 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
       void speak(`${q.title}. ${q.prompt}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, transitioning]);
+  }, [index, items, transitioning]);
 
   const advance = useCallback(
     (newScore: number) => {
       setTransitioning(true);
       setTimeout(() => {
-        if (index + 1 >= TOTAL) {
+        if (index + 1 >= total) {
           onComplete(newScore);
           return;
         }
@@ -214,7 +213,7 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
         setTransitioning(false);
       }, 450);
     },
-    [index, onComplete]
+    [index, onComplete, total]
   );
 
   const handleListenPick = useCallback(
@@ -382,7 +381,7 @@ export function FinalCheckpointGame({ onComplete }: FinalCheckpointGameProps) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-      <ProgressBar current={index} total={TOTAL} />
+      <ProgressBar current={index} total={total} />
 
       <div
         className={cn(
