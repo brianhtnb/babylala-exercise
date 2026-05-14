@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { ProgressBar } from '@/app/components/common/ProgressBar';
 import { speak, stopSpeaking, playEffect } from '@/lib/audio';
-import { listenPickQuestions } from '@/topics/jungle/games/listen-pick-image';
+import { buildListenPickGameSession, LISTEN_PICK_GAME_ROUND_COUNT } from '@/topics/jungle/games/listen-pick-image';
+import type { ListenPickQuestion } from '@/types';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
@@ -15,40 +16,41 @@ interface ListenPickGameProps {
 }
 
 export function ListenPickGame({ onComplete }: ListenPickGameProps) {
+  const [session] = useState<ListenPickQuestion[]>(() => buildListenPickGameSession());
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<'a' | 'b' | 'c' | null>(null);
   const [wrongId, setWrongId] = useState<'a' | 'b' | 'c' | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const total = listenPickQuestions.length;
-  const q = listenPickQuestions[index];
+  const total = LISTEN_PICK_GAME_ROUND_COUNT;
+  const q = session[index]!;
 
   useEffect(() => {
     stopSpeaking();
     setSelected(null);
     setWrongId(null);
     setIsTransitioning(false);
-    speak(q.question).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
+    speak(session[index]!.question).catch(() => {});
+  }, [index, session]);
 
   const handlePlayQuestion = useCallback(() => {
     if (isTransitioning) return;
     stopSpeaking();
-    void speak(q.question);
-  }, [q.question, isTransitioning]);
+    void speak(session[index]!.question);
+  }, [session, index, isTransitioning]);
 
   const handlePlayScript = useCallback(() => {
     if (isTransitioning) return;
     stopSpeaking();
-    void speak(q.script);
-  }, [q.script, isTransitioning]);
+    void speak(session[index]!.script);
+  }, [session, index, isTransitioning]);
 
   const handlePick = useCallback(
     async (choiceId: 'a' | 'b' | 'c') => {
       if (selected !== null || isTransitioning) return;
-      const correct = choiceId === q.correctId;
+      const current = session[index]!;
+      const correct = choiceId === current.correctId;
 
       if (correct) {
         playEffect('correct').catch(() => {});
@@ -70,8 +72,10 @@ export function ListenPickGame({ onComplete }: ListenPickGameProps) {
         setTimeout(() => setWrongId(null), 550);
       }
     },
-    [selected, isTransitioning, q.correctId, score, index, total, onComplete]
+    [selected, isTransitioning, session, index, score, total, onComplete]
   );
+
+  const roundKey = `${q.id}-v${q.scriptVariantIndex}`;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -79,7 +83,7 @@ export function ListenPickGame({ onComplete }: ListenPickGameProps) {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={q.question}
+          key={roundKey}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}

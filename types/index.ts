@@ -64,19 +64,43 @@ export interface SceneReadingQuestion {
   answer: boolean;
 }
 
-/** Listen to a short script, then pick the matching picture (A/B/C). */
+/** One picture choice in listen-pick (A/B/C). */
+export interface ListenPickChoice {
+  id: 'a' | 'b' | 'c';
+  /** Public path e.g. /images/jungle/listen-pick/q01-a.png */
+  image: string;
+  /** Short label for accessibility */
+  label: string;
+}
+
+/**
+ * Authoring shape: one listening script per picture (A / B / C).
+ * Each line describes only that image — positive, kid-friendly wording.
+ * Gameplay picks one script at random; `correctId` matches that choice.
+ */
+export interface ListenPickQuestionDefinition {
+  id: string;
+  question: string;
+  scriptsByChoice: {
+    a: string;
+    b: string;
+    c: string;
+  };
+  choices: ListenPickChoice[];
+  /** Optional: extra vocabulary targets in these scripts (curriculum / authoring note). */
+  vocabularyStretch?: string;
+}
+
+/** Resolved question for one play (one chosen script + matching correct image). */
 export interface ListenPickQuestion {
+  id: string;
   question: string;
   /** Full text under the question; user taps to speak via TTS */
   script: string;
-  choices: {
-    id: 'a' | 'b' | 'c';
-    /** Public path e.g. /images/jungle/listen-pick/q01-a.png */
-    image: string;
-    /** Short label for accessibility */
-    label: string;
-  }[];
+  choices: ListenPickChoice[];
   correctId: 'a' | 'b' | 'c';
+  /** 0 = script for A, 1 = B, 2 = C (matches which script was chosen). */
+  scriptVariantIndex: 0 | 1 | 2;
 }
 
 /** One line in a “speaking presentation” script (display + TTS text). */
