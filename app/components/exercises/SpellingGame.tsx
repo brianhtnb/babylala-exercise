@@ -1,25 +1,26 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressBar } from '../common/ProgressBar';
 import { SpeechButton } from '../common/SpeechButton';
 import { speak, stopSpeaking, playEffect } from '@/lib/audio';
-import { spellingQuestions } from '@/topics/jungle/games/spelling';
+import {
+  SPELLING_FOCUS_WORDS,
+  SPELLING_GAME_ROUND_COUNT,
+  generateSpellingLetters,
+} from '@/topics/jungle/games/spelling';
 import { TYPOGRAPHY } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
 const ANIMAL_IMAGES: Record<string, string> = {
-  bee:       '/images/jungle/animals/bee.png',
-  frog:      '/images/jungle/animals/frog.png',
-  tiger:     '/images/jungle/animals/tiger.png',
-  snake:     '/images/jungle/animals/snake.png',
-  monkey:    '/images/jungle/animals/monkey.png',
-  spider:    '/images/jungle/animals/spider.png',
-  rabbit:    '/images/jungle/animals/rabbit.png',
-  lizard:    '/images/jungle/animals/lizard.png',
-  elephant:  '/images/jungle/animals/elephant.png',
+  bee: '/images/jungle/animals/bee.png',
+  frog: '/images/jungle/animals/frog.png',
+  tiger: '/images/jungle/animals/tiger.png',
+  monkey: '/images/jungle/animals/monkey.png',
+  spider: '/images/jungle/animals/spider.png',
+  lizard: '/images/jungle/animals/lizard.png',
   crocodile: '/images/jungle/animals/crocodile.png',
 };
 
@@ -35,6 +36,7 @@ interface TileState {
 }
 
 interface GameState {
+  wordOrder: readonly string[];
   currentIndex: number;
   score: number;
   tiles: TileState[];
@@ -42,8 +44,17 @@ interface GameState {
   isTransitioning: boolean;
 }
 
-function buildTiles(questionIndex: number): TileState[] {
-  return spellingQuestions[questionIndex].letters.map((l) => ({
+function shuffleWordOrder(): string[] {
+  const arr = [...SPELLING_FOCUS_WORDS];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildTilesForWord(word: string): TileState[] {
+  return generateSpellingLetters(word, Math.random).map((l) => ({
     ...l,
     found: false,
     wrongFlash: false,
@@ -51,23 +62,29 @@ function buildTiles(questionIndex: number): TileState[] {
 }
 
 export function SpellingGame({ onComplete }: SpellingGameProps) {
-  const [state, setState] = useState<GameState>(() => ({
-    currentIndex: 0,
-    score: 0,
-    tiles: buildTiles(0),
-    wordComplete: false,
-    isTransitioning: false,
-  }));
+  const total = SPELLING_GAME_ROUND_COUNT;
 
-  const q = spellingQuestions[state.currentIndex];
-  const total = spellingQuestions.length;
+  const [state, setState] = useState<GameState>(() => {
+    const wordOrder = shuffleWordOrder();
+    const first = wordOrder[0]!;
+    return {
+      wordOrder,
+      currentIndex: 0,
+      score: 0,
+      tiles: buildTilesForWord(first),
+      wordComplete: false,
+      isTransitioning: false,
+    };
+  });
+
+  const word = state.wordOrder[state.currentIndex]!;
 
   useEffect(() => {
     if (!state.isTransitioning && !state.wordComplete) {
       stopSpeaking();
-      speak(`Find the extra letter in: ${q.word}`).catch(() => {});
+      speak(`Find the extra letter in: ${word}`).catch(() => {});
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.currentIndex, state.isTransitioning]);
 
   const moveToNext = useCallback(
@@ -77,15 +94,17 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
         onComplete(newScore);
         return;
       }
+      const nextWord = state.wordOrder[nextIndex]!;
       setState({
+        wordOrder: state.wordOrder,
         currentIndex: nextIndex,
         score: newScore,
-        tiles: buildTiles(nextIndex),
+        tiles: buildTilesForWord(nextWord),
         wordComplete: false,
         isTransitioning: false,
       });
     },
-    [state.currentIndex, total, onComplete]
+    [state.currentIndex, state.wordOrder, total, onComplete]
   );
 
   const handleTileTap = useCallback(
@@ -94,11 +113,10 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
       const tile = state.tiles[tileIndex];
       if (tile.found) return;
 
+      const currentWord = state.wordOrder[state.currentIndex]!;
+
       if (tile.isRedundant) {
-        // Mark tile as found
-        const newTiles = state.tiles.map((t, i) =>
-          i === tileIndex ? { ...t, found: true } : t
-        );
+        const newTiles = state.tiles.map((t, i) => (i === tileIndex ? { ...t, found: true } : t));
         playEffect('correct').catch(() => {});
         const allFound = newTiles.every((t) => !t.isRedundant || t.found);
 
@@ -112,9 +130,12 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
             isTransitioning: true,
             score: newScore,
           }));
-          // Speak the word then wait before advancing
           (async () => {
-            try { await speak(q.word); } catch { /* ignore */ }
+            try {
+              await speak(currentWord);
+            } catch {
+              /* ignore */
+            }
             await new Promise<void>((r) => setTimeout(r, 450));
             moveToNext(newScore);
           })();
@@ -122,7 +143,6 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
           setState((prev) => ({ ...prev, tiles: newTiles }));
         }
       } else {
-        // Wrong tap — flash red briefly
         playEffect('incorrect').catch(() => {});
         setState((prev) => ({
           ...prev,
@@ -142,14 +162,18 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
   const redundantCount = state.tiles.filter((t) => t.isRedundant).length;
   const foundCount = state.tiles.filter((t) => t.isRedundant && t.found).length;
 
+  const tileLayoutKey = useMemo(
+    () => state.tiles.map((t) => `${t.char}${t.isRedundant ? 'x' : 'o'}`).join(''),
+    [state.tiles]
+  );
+
   return (
     <div className="max-w-2xl mx-auto">
       <ProgressBar current={state.currentIndex} total={total} />
 
       <div className="panel p-6 mt-4 text-center">
-        {/* Animal emoji + name */}
         <motion.div
-          key={state.currentIndex}
+          key={`${state.currentIndex}-${word}`}
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 280, damping: 20 }}
@@ -157,8 +181,8 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
         >
           <div className="flex justify-center mb-3">
             <Image
-              src={ANIMAL_IMAGES[q.word] ?? q.emoji}
-              alt={q.word}
+              src={ANIMAL_IMAGES[word] ?? '/images/jungle/animals/bee.png'}
+              alt={word}
               width={160}
               height={160}
               className="object-contain drop-shadow-md"
@@ -166,8 +190,8 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
             />
           </div>
           <div className="flex items-center justify-center gap-2">
-            <p className={cn(TYPOGRAPHY.sectionTitle, 'capitalize')}>{q.word}</p>
-            <SpeechButton text={q.word} />
+            <p className={cn(TYPOGRAPHY.sectionTitle, 'capitalize')}>{word}</p>
+            <SpeechButton text={word} />
           </div>
         </motion.div>
 
@@ -176,15 +200,15 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
           {redundantCount > 1 && ` (${foundCount}/${redundantCount} found)`}
         </p>
 
-        {/* Letter tiles */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={state.currentIndex}
+            key={`${state.currentIndex}-${tileLayoutKey}`}
             className="flex flex-wrap justify-center gap-2 mb-4"
           >
             {state.tiles.map((tile, i) => (
               <motion.button
-                key={i}
+                key={`${state.currentIndex}-${i}-${tile.char}-${tile.isRedundant}`}
+                type="button"
                 onClick={() => handleTileTap(i)}
                 disabled={tile.found || state.wordComplete}
                 animate={
@@ -198,8 +222,8 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
                   tile.found
                     ? 'bg-surface-secondary border-dm-border text-content-muted line-through opacity-50'
                     : tile.wrongFlash
-                    ? 'bg-danger/20 border-danger text-danger'
-                    : 'bg-warning-light border-warning/50 text-content hover:bg-warning/30 hover:border-warning active:scale-95 cursor-pointer'
+                      ? 'bg-danger/20 border-danger text-danger'
+                      : 'bg-warning-light border-warning/50 text-content hover:bg-warning/30 hover:border-warning active:scale-95 cursor-pointer'
                 )}
                 aria-label={tile.isRedundant ? `Extra letter ${tile.char}` : `Letter ${tile.char}`}
               >
@@ -209,7 +233,6 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
           </motion.div>
         </AnimatePresence>
 
-        {/* Word complete celebration */}
         <AnimatePresence>
           {state.wordComplete && (
             <motion.div
@@ -218,18 +241,19 @@ export function SpellingGame({ onComplete }: SpellingGameProps) {
               exit={{ scale: 0, opacity: 0 }}
               className="flex flex-col items-center gap-2 py-3"
             >
-              <span className="text-4xl" aria-hidden>🎉</span>
+              <span className="text-4xl" aria-hidden>
+                🎉
+              </span>
               <p className={cn(TYPOGRAPHY.cardTitle, 'text-success')}>
-                Great job! The word is <span className="capitalize">{q.word}</span>!
+                Great job! The word is <span className="capitalize">{word}</span>!
               </p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Hint */}
         {!state.wordComplete && (
           <p className="text-xs text-content-muted mt-3">
-            {state.score} / {state.currentIndex} correct so far
+            Score {state.score} · Round {state.currentIndex + 1} of {total}
           </p>
         )}
       </div>

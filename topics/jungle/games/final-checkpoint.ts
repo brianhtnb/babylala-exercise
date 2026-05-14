@@ -1,7 +1,7 @@
 import type { CheckpointItem } from '@/types';
 import { listenPickQuestions } from '@/topics/jungle/games/listen-pick-image';
 import { readingSceneQuestions } from '@/topics/jungle/games/reading-quiz';
-import { spellingQuestions } from '@/topics/jungle/games/spelling';
+import { CHECKPOINT_SPELLING_BEE_LETTERS } from '@/topics/jungle/games/spelling';
 
 /**
  * End-of-topic mixed skills review (jungle). Order: listen → read → write → speak.
@@ -60,9 +60,9 @@ export const jungleCheckpointItems: CheckpointItem[] = [
     id: 'cp-w1',
     skill: 'write',
     mode: 'extra-letter',
-    word: spellingQuestions[0].word,
+    word: 'bee',
     image: '/images/jungle/animals/bee.png',
-    letters: spellingQuestions[0].letters,
+    letters: CHECKPOINT_SPELLING_BEE_LETTERS,
   },
   {
     id: 'cp-w2',

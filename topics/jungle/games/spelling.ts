@@ -1,136 +1,125 @@
 import type { SpellingQuestion } from '@/types';
 
 /**
- * Each word has its correct letters plus one or two redundant letters inserted
- * at semi-random positions. Players must identify and tap the extra letters.
+ * Jungle spelling (find extra letter): seven focus animals only.
+ * Rabbit, elephant, and snake are excluded from this exercise.
  */
-export const spellingQuestions: SpellingQuestion[] = [
-  {
-    word: 'bee',
-    emoji: '🐝',
-    letters: [
-      { char: 'B', isRedundant: false },
-      { char: 'E', isRedundant: false },
-      { char: 'X', isRedundant: true },
-      { char: 'E', isRedundant: false },
-    ],
-  },
-  {
-    word: 'frog',
-    emoji: '🐸',
-    letters: [
-      { char: 'F', isRedundant: false },
-      { char: 'R', isRedundant: false },
-      { char: 'P', isRedundant: true },
-      { char: 'O', isRedundant: false },
-      { char: 'G', isRedundant: false },
-    ],
-  },
-  {
-    word: 'tiger',
-    emoji: '🐯',
-    letters: [
-      { char: 'T', isRedundant: false },
-      { char: 'X', isRedundant: true },
-      { char: 'I', isRedundant: false },
-      { char: 'G', isRedundant: false },
-      { char: 'E', isRedundant: false },
-      { char: 'R', isRedundant: false },
-    ],
-  },
-  {
-    word: 'snake',
-    emoji: '🐍',
-    letters: [
-      { char: 'S', isRedundant: false },
-      { char: 'N', isRedundant: false },
-      { char: 'A', isRedundant: false },
-      { char: 'K', isRedundant: false },
-      { char: 'B', isRedundant: true },
-      { char: 'E', isRedundant: false },
-    ],
-  },
-  {
-    word: 'monkey',
-    emoji: '🐒',
-    letters: [
-      { char: 'M', isRedundant: false },
-      { char: 'O', isRedundant: false },
-      { char: 'N', isRedundant: false },
-      { char: 'T', isRedundant: true },
-      { char: 'K', isRedundant: false },
-      { char: 'E', isRedundant: false },
-      { char: 'Y', isRedundant: false },
-    ],
-  },
-  {
-    word: 'spider',
-    emoji: '🕷️',
-    letters: [
-      { char: 'S', isRedundant: false },
-      { char: 'P', isRedundant: false },
-      { char: 'I', isRedundant: false },
-      { char: 'D', isRedundant: false },
-      { char: 'Q', isRedundant: true },
-      { char: 'E', isRedundant: false },
-      { char: 'R', isRedundant: false },
-    ],
-  },
-  {
-    word: 'rabbit',
-    emoji: '🐰',
-    letters: [
-      { char: 'R', isRedundant: false },
-      { char: 'A', isRedundant: false },
-      { char: 'B', isRedundant: false },
-      { char: 'B', isRedundant: false },
-      { char: 'W', isRedundant: true },
-      { char: 'I', isRedundant: false },
-      { char: 'T', isRedundant: false },
-    ],
-  },
-  {
-    word: 'lizard',
-    emoji: '🦎',
-    letters: [
-      { char: 'L', isRedundant: false },
-      { char: 'I', isRedundant: false },
-      { char: 'Z', isRedundant: false },
-      { char: 'V', isRedundant: true },
-      { char: 'A', isRedundant: false },
-      { char: 'R', isRedundant: false },
-      { char: 'D', isRedundant: false },
-    ],
-  },
-  {
-    word: 'elephant',
-    emoji: '🐘',
-    letters: [
-      { char: 'E', isRedundant: false },
-      { char: 'L', isRedundant: false },
-      { char: 'E', isRedundant: false },
-      { char: 'P', isRedundant: false },
-      { char: 'H', isRedundant: false },
-      { char: 'A', isRedundant: false },
-      { char: 'Z', isRedundant: true },
-      { char: 'N', isRedundant: false },
-      { char: 'T', isRedundant: false },
-    ],
-  },
-  {
-    word: 'crocodile',
-    emoji: '🐊',
-    letters: [
-      { char: 'C', isRedundant: false },
-      { char: 'R', isRedundant: false },
-      { char: 'O', isRedundant: false },
-      { char: 'C', isRedundant: false },
-      { char: 'H', isRedundant: true },
-      { char: 'O', isRedundant: false },
-      { char: 'D', isRedundant: false },
-      { char: 'I', isRedundant: false },
-      { char: 'L', isRedundant: false },
-      { char: 'E', isRedundant: false },
-    ],
-  },
-];
+export const SPELLING_FOCUS_WORDS = [
+  'bee',
+  'frog',
+  'tiger',
+  'monkey',
+  'spider',
+  'lizard',
+  'crocodile',
+] as const;
+
+export type SpellingFocusWord = (typeof SPELLING_FOCUS_WORDS)[number];
+
+export const SPELLING_GAME_ROUND_COUNT = SPELLING_FOCUS_WORDS.length;
+
+const WORD_EMOJI: Record<SpellingFocusWord, string> = {
+  bee: '🐝',
+  frog: '🐸',
+  tiger: '🐯',
+  monkey: '🐒',
+  spider: '🕷️',
+  lizard: '🦎',
+  crocodile: '🐊',
+};
+
+export function getSpellingWordEmoji(word: string): string {
+  return WORD_EMOJI[word as SpellingFocusWord] ?? '🐾';
+}
+
+/** Deterministic PRNG for stable module-level exports (e.g. checkpoint data). */
+export function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a += 0x6d2b79f5;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffleInPlace<T>(arr: T[], random: () => number): void {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+/**
+ * Merge two sequences so each keeps its internal order; every interleaving is
+ * equally likely (uniform among C(n+k, k) outcomes).
+ */
+function interleavePreserveOrder(
+  correct: SpellingQuestion['letters'],
+  extras: SpellingQuestion['letters'],
+  random: () => number
+): SpellingQuestion['letters'] {
+  const out: SpellingQuestion['letters'] = [];
+  let i = 0;
+  let j = 0;
+  while (i < correct.length || j < extras.length) {
+    const remC = correct.length - i;
+    const remE = extras.length - j;
+    if (remE === 0) {
+      out.push(correct[i]!);
+      i += 1;
+    } else if (remC === 0) {
+      out.push(extras[j]!);
+      j += 1;
+    } else if (random() * (remC + remE) < remC) {
+      out.push(correct[i]!);
+      i += 1;
+    } else {
+      out.push(extras[j]!);
+      j += 1;
+    }
+  }
+  return out;
+}
+
+/**
+ * Builds letter tiles: correct letters stay in spelling order left-to-right; 1–2 decoy
+ * letters (not in the word) are interleaved at random slots. Decoys may be shuffled
+ * among themselves before merging.
+ */
+export function generateSpellingLetters(
+  word: string,
+  random: () => number
+): SpellingQuestion['letters'] {
+  const w = word.toLowerCase();
+  if (!/^[a-z]+$/.test(w)) {
+    throw new Error(`Invalid spelling word: ${word}`);
+  }
+
+  const decoyPool = 'abcdefghijklmnopqrstuvwxyz'.split('').filter((c) => !w.includes(c));
+  shuffleInPlace(decoyPool, random);
+
+  let redundantCount = random() < 0.55 ? 1 : 2;
+  const maxExtrasForBoard = Math.max(1, 12 - w.length);
+  redundantCount = Math.min(redundantCount, maxExtrasForBoard, decoyPool.length);
+  redundantCount = Math.max(1, redundantCount);
+
+  const correct: SpellingQuestion['letters'] = w.split('').map((c) => ({
+    char: c.toUpperCase(),
+    isRedundant: false,
+  }));
+
+  const extras: SpellingQuestion['letters'] = [];
+  for (let k = 0; k < redundantCount; k++) {
+    const dec = decoyPool[k % decoyPool.length]!.toUpperCase();
+    extras.push({ char: dec, isRedundant: true });
+  }
+  shuffleInPlace(extras, random);
+
+  return interleavePreserveOrder(correct, extras, random);
+}
+
+/** Stable bee puzzle for `final-checkpoint` import (SSR-safe). */
+const checkpointBeeRng = mulberry32(0xbeefcafe);
+export const CHECKPOINT_SPELLING_BEE_LETTERS = generateSpellingLetters('bee', checkpointBeeRng);

@@ -19,6 +19,7 @@ import { FinalCheckpointGame } from '@/app/components/exercises/FinalCheckpointG
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { jungleCheckpointItems } from '@/topics/jungle/games/final-checkpoint';
+import { SPELLING_GAME_ROUND_COUNT } from '@/topics/jungle/games/spelling';
 import { loadProgress, saveProgress, updateGameProgress, getGameProgress } from '@/lib/storage';
 import { PAGE_CONTAINER, TYPOGRAPHY, FADE_IN } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
@@ -88,7 +89,7 @@ export default function ExercisePageClient() {
       case 'listen-pick':
         return 7;
       case 'spelling':
-        return 10;
+        return SPELLING_GAME_ROUND_COUNT;
       case 'reading-quiz':
         return 5;
       case 'count-complete':
