@@ -12,11 +12,21 @@ export interface GameConfig {
     | 'count-complete'
     | 'scene-reading'
     | 'speaking-present'
-    | 'final-checkpoint';
+    | 'final-checkpoint'
+    /** Jungle Explorer map mini-games */
+    | 'honey-bridge'
+    | 'shadow-match'
+    | 'lily-pad-count'
+    | 'fruit-catch';
   title: string;
   description: string;
   difficulty: 1 | 2 | 3;
   dependsOn?: string[];
+  /**
+   * When true, the game is not shown as a card on the topic page (e.g. Jungle Explorer
+   * map-only mini-games). Still routable via `/topic/.../exercise/{id}` from the map.
+   */
+  hideFromTopicList?: boolean;
 }
 
 /* ── Jungle game data types ─────────────────────────────────── */
@@ -215,10 +225,29 @@ export interface GameProgress {
   attempts: number;
 }
 
+export type JungleRegionId = 'meadow' | 'cave' | 'swamp' | 'treehouse' | 'temple';
+
+export type JungleExplorerBadgeId = 'bee' | 'tiger' | 'crocodile' | 'monkey';
+
+export type JungleExplorerToolId = 'binoculars' | 'compass';
+
+export interface JungleExplorerProgress {
+  version: 1;
+  currentRegion: JungleRegionId;
+  unlockedRegions: JungleRegionId[];
+  badges: JungleExplorerBadgeId[];
+  toolsUnlocked: JungleExplorerToolId[];
+  /** Word (lowercase) → mastery stars 1–5 */
+  wordMastery: Partial<Record<string, 1 | 2 | 3 | 4 | 5>>;
+  regionFirstClear: Partial<Record<JungleRegionId, boolean>>;
+}
+
 export interface TopicProgress {
   completed: boolean;
   totalStars: number;
   games: { [gameId: string]: GameProgress };
+  /** Jungle Explorer map / logbook state (optional; derived + merged from game progress). */
+  explorer?: JungleExplorerProgress;
 }
 
 export interface AppSettings {

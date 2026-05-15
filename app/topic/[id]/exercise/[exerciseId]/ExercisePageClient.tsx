@@ -16,12 +16,21 @@ import { VocabIntroGame } from '@/app/components/exercises/VocabIntroGame';
 import { ListenPickGame } from '@/app/components/exercises/ListenPickGame';
 import { SpeakingPresentationGame } from '@/app/components/exercises/SpeakingPresentationGame';
 import { FinalCheckpointGame } from '@/app/components/exercises/FinalCheckpointGame';
+import { HoneyBridgeGame } from '@/app/components/exercises/HoneyBridgeGame';
+import { ShadowMatchGame } from '@/app/components/exercises/ShadowMatchGame';
+import { LilyPadCountGame } from '@/app/components/exercises/LilyPadCountGame';
+import { FruitCatchGame } from '@/app/components/exercises/FruitCatchGame';
 import { GameComplete } from '@/app/components/exercises/GameComplete';
 import { getTopicById } from '@/topics';
 import { JUNGLE_CHECKPOINT_ITEM_COUNT } from '@/topics/jungle/games/final-checkpoint';
+import { HONEY_BRIDGE_ROUND_COUNT } from '@/topics/jungle/games/honey-bridge';
+import { SHADOW_MATCH_ROUND_COUNT } from '@/topics/jungle/games/shadow-match';
+import { LILY_PAD_ROUND_COUNT } from '@/topics/jungle/games/lily-pad-count';
+import { FRUIT_CATCH_ROUND_COUNT } from '@/topics/jungle/games/fruit-catch';
 import { LISTEN_PICK_GAME_ROUND_COUNT } from '@/topics/jungle/games/listen-pick-image';
 import { SPELLING_GAME_ROUND_COUNT } from '@/topics/jungle/games/spelling';
 import { loadProgress, saveProgress, updateGameProgress, getGameProgress } from '@/lib/storage';
+import { syncJungleExplorerProgress } from '@/lib/jungle-explorer';
 import { PAGE_CONTAINER, TYPOGRAPHY, FADE_IN } from '@/lib/design-tokens';
 import { cn } from '@/lib/utils';
 
@@ -101,6 +110,14 @@ export default function ExercisePageClient() {
         return 1;
       case 'final-checkpoint':
         return JUNGLE_CHECKPOINT_ITEM_COUNT;
+      case 'honey-bridge':
+        return HONEY_BRIDGE_ROUND_COUNT;
+      case 'shadow-match':
+        return SHADOW_MATCH_ROUND_COUNT;
+      case 'lily-pad-count':
+        return LILY_PAD_ROUND_COUNT;
+      case 'fruit-catch':
+        return FRUIT_CATCH_ROUND_COUNT;
       default:
         return 10;
     }
@@ -118,11 +135,14 @@ export default function ExercisePageClient() {
     else if (percentage >= 40) stars = 1;
 
     const progress = loadProgress();
-    const updatedProgress = updateGameProgress(progress, topicId, exerciseId, {
+    let updatedProgress = updateGameProgress(progress, topicId, exerciseId, {
       completed: true,
       highScore: finalScore,
       stars,
     });
+    if (topicId === 'jungle') {
+      updatedProgress = syncJungleExplorerProgress(updatedProgress);
+    }
     saveProgress(updatedProgress);
   };
 
@@ -169,6 +189,14 @@ export default function ExercisePageClient() {
         return <SpeakingPresentationGame onComplete={handleGameComplete} />;
       case 'final-checkpoint':
         return <FinalCheckpointGame onComplete={handleGameComplete} />;
+      case 'honey-bridge':
+        return <HoneyBridgeGame onComplete={handleGameComplete} />;
+      case 'shadow-match':
+        return <ShadowMatchGame onComplete={handleGameComplete} />;
+      case 'lily-pad-count':
+        return <LilyPadCountGame onComplete={handleGameComplete} />;
+      case 'fruit-catch':
+        return <FruitCatchGame onComplete={handleGameComplete} />;
       default:
         return <div>Unknown game type</div>;
     }

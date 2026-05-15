@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -9,14 +10,18 @@ import {
   Calculator,
   ChevronLeft,
   ClipboardCheck,
+  Cherry,
+  Droplets,
   Hash,
   Headphones,
   Images,
   Languages,
+  Layers,
   Map,
   MessageCircle,
   Mic2,
   Pencil,
+  ScanSearch,
   Sparkles,
   SpellCheck,
   type LucideIcon,
@@ -33,6 +38,10 @@ import { PAGE_CONTAINER, TYPOGRAPHY, ANIMATION_DURATIONS, SETTLE_IN } from '@/li
 
 /** Jungle-only decorative card backgrounds (public paths). */
 const JUNGLE_GAME_CARD_BACKGROUNDS: Partial<Record<GameConfig['type'], string>> = {
+  'honey-bridge': '/images/jungle/adventure/region-meadow-thumb.png',
+  'shadow-match': '/images/jungle/adventure/region-cave-thumb.png',
+  'lily-pad-count': '/images/jungle/adventure/region-swamp-thumb.png',
+  'fruit-catch': '/images/jungle/adventure/region-tree-thumb.png',
   'vocab-intro': '/images/jungle/animals/monkey.png',
   'listen-pick': '/images/jungle/animals/scene-frogs-crocodiles.png',
   spelling: '/images/jungle/animals/bee.png',
@@ -120,6 +129,30 @@ const GAME_VISUALS: Record<
     iconWrap: 'border-primary/40 bg-primary/[0.1]',
     iconClass: 'text-primary',
     Icon: ClipboardCheck,
+  },
+  'honey-bridge': {
+    shell: 'bg-warning-light border-warning/45',
+    iconWrap: 'border-warning/40 bg-warning-light',
+    iconClass: 'text-warning',
+    Icon: Layers,
+  },
+  'shadow-match': {
+    shell: 'bg-surface-secondary border-dm-border',
+    iconWrap: 'border-content/20 bg-content/10',
+    iconClass: 'text-content',
+    Icon: ScanSearch,
+  },
+  'lily-pad-count': {
+    shell: 'bg-info-light border-info/40',
+    iconWrap: 'border-info/35 bg-info-light',
+    iconClass: 'text-info',
+    Icon: Droplets,
+  },
+  'fruit-catch': {
+    shell: 'bg-success-light border-success/45',
+    iconWrap: 'border-success/40 bg-success-light',
+    iconClass: 'text-success',
+    Icon: Cherry,
   },
 };
 
@@ -222,10 +255,26 @@ export default function TopicPageClient() {
             Learn {topic.vocabulary.length} new words and practice {topic.sentences.length} sentence
             patterns!
           </p>
+          {isJungleTopic ? (
+            <div className="mt-6 flex justify-center">
+              <Link
+                href="/topic/jungle/explore"
+                className={cn(
+                  TYPOGRAPHY.control,
+                  'inline-flex items-center gap-2 rounded-xl border-2 border-success/45 bg-success/12 px-5 py-2.5 text-success shadow-nexus-sm hover:bg-success/18 hover:border-success/55 transition-colors'
+                )}
+              >
+                <Map className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+                Jungle Explorer map
+              </Link>
+            </div>
+          ) : null}
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
-          {topic.games.map((game, index) => {
+          {topic.games
+            .filter((game) => !game.hideFromTopicList)
+            .map((game, index) => {
             const gameProgress = progress
               ? getGameProgress(progress, topicId, game.id)
               : { completed: false, stars: 0 };
